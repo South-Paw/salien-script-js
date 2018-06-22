@@ -100,7 +100,7 @@ async function leaveCurrentGame(token, leaveCurrentPlanet) {
 
   // Please do not change our clanid if you are going to use this script
   // If you want to cheat for your own group, come up with up with your own approach, thank you
-  if (!playerInfo['clan_info']['accountid'] || playerInfo['clan_info']['accountid'] != 4777282) {
+  if (!playerInfo['clan_info'] || !playerInfo['clan_info']['accountid'] || playerInfo['clan_info']['accountid'] != 4777282) {
     await fetch(getUrl('ITerritoryControlMinigameService/RepresentClan/v0001', `clanid=4777282&access_token=${token}`), getOptions({ method: 'POST' }));
   }
 
