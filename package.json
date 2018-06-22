@@ -1,13 +1,17 @@
 {
   "name": "salien-script-js",
-  "version": "0.0.1",
-  "description": "Cheating Salien minigame, the proper way.",
+  "version": "0.0.2",
+  "description": "Scripting the Steam Salien Sale minigame, the proper way.",
   "keywords": [
     "salien",
     "steam",
+    "steam-sale",
     "sale",
     "game",
-    "script"
+    "script",
+    "steam-salien",
+    "salien-cheat",
+    "salien-script"
   ],
   "homepage": "https://github.com/South-Paw/salien-script-js",
   "bugs": "https://github.com/South-Paw/salien-script-js/issues",
