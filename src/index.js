@@ -218,7 +218,7 @@ async function reportScore(token, score) {
   return;
 }
 
-class SalienCheat {
+class SalienScript {
   constructor({ token }) {
     this.token = token;
     this.currentPlanetId = null;
@@ -283,4 +283,4 @@ class SalienCheat {
   };
 }
 
-module.exports = SalienCheat;
+module.exports = SalienScript;

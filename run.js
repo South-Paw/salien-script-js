@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const SalienCheat = require('./src/index.js');
+const SalienScript = require('./src/index.js');
 
 let token;
 
@@ -13,7 +13,7 @@ try {
 }
 
 if (token) {
-  const cheat = new SalienCheat({ token });
+  const salien = new SalienScript({ token });
 
-  cheat.run();
+  salien.run();
 }
