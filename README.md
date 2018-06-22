@@ -1,4 +1,4 @@
-# salien-cheat-node
+# salien-script-js
 
 👽 Cheating the Steam Salien Sale minigame, the proper way.
 
@@ -21,7 +21,7 @@
 ## Advanced: Usage as package
 
 ```js
-const SalienCheat = require('salien-cheat-node');
+const SalienCheat = require('salien-script-js');
 
 const config = {
   token: '', // Your token from https://steamcommunity.com/saliengame/gettoken

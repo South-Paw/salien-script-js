@@ -1,5 +1,5 @@
 {
-  "name": "salien-cheat-node",
+  "name": "salien-script-js",
   "version": "0.0.1",
   "description": "Cheating Salien minigame, the proper way.",
   "keywords": [
@@ -9,8 +9,8 @@
     "game",
     "script"
   ],
-  "homepage": "https://github.com/South-Paw/salien-cheat-node",
-  "bugs": "https://github.com/South-Paw/salien-cheat-node/issues",
+  "homepage": "https://github.com/South-Paw/salien-script-js",
+  "bugs": "https://github.com/South-Paw/salien-script-js/issues",
   "license": "MIT",
   "contributors": [
     {
@@ -25,7 +25,7 @@
   "main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/South-Paw/salien-cheat-node.git"
+    "url": "https://github.com/South-Paw/salien-script-js.git"
   },
   "dependencies": {
     "delay": "^3.0.0",
