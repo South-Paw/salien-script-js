@@ -104,6 +104,16 @@ async function leaveCurrentGame(token, leaveCurrentPlanet) {
     await fetch(getUrl('ITerritoryControlMinigameService/RepresentClan/v0001', `clanid=4777282&access_token=${token}`), getOptions({ method: 'POST' }));
   }
 
+  while (!playerInfo) {
+    playerInfo = await getPlayerInfo(token);
+  }
+
+  if (!playerInfo['clan_info'] || !playerInfo['clan_info']['accountid'] || playerInfo['clan_info']['accountid'] != 4777282) {
+    console.log('\nYou need to join the SteamDB group to use this script!\n');
+    console.log('https://steamcommunity.com/groups/SteamDB\n');
+    process.exit(1);
+  }
+
   if (playerInfo['active_zone_game']) {
     console.log('Leaving `active_zone_game`...');
 
