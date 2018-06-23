@@ -48,5 +48,5 @@ const config = {
 
 const salien = new SalienScript(config);
 
-salien.run();
+salien.init();
 ```
