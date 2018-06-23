@@ -58,7 +58,7 @@ class SalienScript {
     this.defaultDelaySec = this.defaultDelayMs / 1000;
   }
 
-  async RequestAPI(method, params, additionalOptions = {}) {
+  async RequestAPI(method, params, maxRetries, additionalOptions = {}) {
     let url = `https://community.steam-api.com/${method}/v0001`;
 
     if (params) {
@@ -88,7 +88,7 @@ class SalienScript {
     let response;
     let retries = 0;
 
-    while (!response && retries < this.maxRetries) {
+    while (!response && retries < maxRetries) {
       try {
         logger(chalk.blue(`Sending ${method}...`));
         request = await fetch(url, options);
@@ -99,7 +99,7 @@ class SalienScript {
 
         retries += 1;
 
-        if (retries < this.maxRetries) {
+        if (retries < maxRetries) {
           logger(chalk.yellow(`Retrying ${method} in ${this.defaultDelaySec} seconds...`));
         } else {
           throw new SalienScriptException(`Failed ${method} after ${retries} retries`);
@@ -113,12 +113,20 @@ class SalienScript {
   }
 
   async ApiGetPlanets() {
-    const response = await this.RequestAPI('ITerritoryControlMinigameService/GetPlanets', ['active_only=1']);
+    const response = await this.RequestAPI(
+      'ITerritoryControlMinigameService/GetPlanets',
+      ['active_only=1'],
+      this.maxRetries,
+    );
     return response.planets;
   }
 
   async ApiGetPlanet(planetId) {
-    const response = await this.RequestAPI('ITerritoryControlMinigameService/GetPlanet', [`id=${planetId}`]);
+    const response = await this.RequestAPI(
+      'ITerritoryControlMinigameService/GetPlanet',
+      [`id=${planetId}`],
+      this.maxRetries,
+    );
     return response;
   }
 
@@ -126,6 +134,7 @@ class SalienScript {
     const response = await this.RequestAPI(
       'ITerritoryControlMinigameService/GetPlayerInfo',
       [`access_token=${this.token}`],
+      this.maxRetries,
       { method: 'POST' },
     );
     return response;
@@ -135,6 +144,7 @@ class SalienScript {
     const response = await this.RequestAPI(
       'ITerritoryControlMinigameService/RepresentClan',
       [`access_token=${this.token}`, `clanid=${clanId}`],
+      this.maxRetries,
       { method: 'POST' },
     );
     return response;
@@ -144,6 +154,7 @@ class SalienScript {
     const response = await this.RequestAPI(
       'IMiniGameService/LeaveGame',
       [`access_token=${this.token}`, `gameid=${gameId}`],
+      this.maxRetries,
       { method: 'POST' },
     );
     return response;
@@ -153,6 +164,7 @@ class SalienScript {
     const response = await this.RequestAPI(
       'ITerritoryControlMinigameService/JoinPlanet',
       [`access_token=${this.token}`, `id=${planetId}`],
+      this.maxRetries,
       { method: 'POST' },
     );
     return response;
