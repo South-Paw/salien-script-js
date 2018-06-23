@@ -56,6 +56,7 @@ class SalienScript {
     this.maxRetries = 2;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
+    this.currentPlanetId = null;
   }
 
   async RequestAPI(method, params, maxRetries, additionalOptions = {}) {
@@ -173,10 +174,6 @@ class SalienScript {
   async setupGame() {
     debug(await this.ApiGetPlanets());
 
-    // TODO: the `meow` CLI doesn't exit gracefully on the new version
-    // of the script - figure out why
-    process.exit();
-
     // while we haven't got a current planet
       // TODO try follow preferences of the user (ie; planets with appid they want or specific name??)
       // TODO add an option to select going for the hardest difficulty only??
@@ -189,6 +186,8 @@ class SalienScript {
   }
 
   async gameLoop() {
+    throw new SalienScriptException(`gameLoop() not yet implemented`);
+
     // if last restart was greater than an hour ago
       // change planet
 
