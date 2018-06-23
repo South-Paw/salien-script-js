@@ -1,4 +1,5 @@
 const meow = require('meow');
+
 const SalienScript = require('./src/index.js');
 
 /** @type {meow.Options} */
@@ -6,11 +7,11 @@ const cliOptions = {
   flags: {
     token: {
       type: 'string',
-      alias: 't'
+      alias: 't',
     },
-    groupid: {
+    group: {
       type: 'string',
-      alias: 'g'
+      alias: 'g',
     },
   },
 };
@@ -21,16 +22,11 @@ const cli = meow(`
 
     Options
       --token, -t     Your game token.
-      --groupid, -g   The ID of a group you'd like to represent. (optional)
+      --group, -g      The ID of a steam group you'd like to represent. (optional)
 `, cliOptions);
 
 if (cli.flags.token) {
-  const salien = new SalienScript({ token: cli.flags.token });
+  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.clan });
 
   salien.init();
-} else {
-  console.log(`
-    You haven't specified a token...
-    Please read the README: https://github.com/South-Paw/salien-script-js
-  `);
 }

@@ -35,6 +35,12 @@ const logger = (...messages) => console.log(chalk.white(dateFormat(new Date(), '
 // eslint-disable-next-line no-console
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
 
+const asyncForEach = async (array, callback, _this) => {
+  for (let index = 0; index < array.length; index += 1) {
+    await callback(array[index], index, array, _this);
+  }
+};
+
 class SalienScriptException {
   constructor(message) {
     this.name = 'SalienScriptException';
@@ -50,13 +56,16 @@ class SalienScriptRestart {
 }
 
 class SalienScript {
-  constructor({ token }) {
+  constructor({ token, clan }) {
     this.token = token;
+    this.clan = clan;
 
     this.maxRetries = 2;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
+
     this.currentPlanetId = null;
+    this.knownPlanets = [];
   }
 
   async RequestAPI(method, params, maxRetries, additionalOptions = {}) {
@@ -125,10 +134,10 @@ class SalienScript {
   async ApiGetPlanet(planetId) {
     const response = await this.RequestAPI(
       'ITerritoryControlMinigameService/GetPlanet',
-      [`id=${planetId}`],
+      [`id=${planetId}`, 'language=english'],
       this.maxRetries,
     );
-    return response;
+    return response.planets[0];
   }
 
   async ApiGetPlayerInfo() {
@@ -171,7 +180,103 @@ class SalienScript {
     return response;
   }
 
+  async leaveCurrentGame(leaveCurrentPlanet) {
+    const playerInfo = await this.ApiGetPlayerInfo();
+
+    if (this.clan) {
+      await this.ApiRepresentClan(this.clan);
+    }
+
+    if (playerInfo.active_zone_game) {
+      logger(`Leaving ${playerInfo.active_zone_game}...`);
+
+      try {
+        await this.ApiLeaveGame(playerInfo.active_zone_game);
+        logger('Success!');
+      } catch (e) {
+        throw new SalienScriptException(e);
+      }
+    }
+  }
+
   async setupGame() {
+    const planets = await this.ApiGetPlanets();
+
+    if (!planets) {
+      throw new SalienScriptException("Didn't find any planets.");
+    }
+
+    await asyncForEach(
+      planets,
+      async (planet, index, array, _this) => {
+        _this.knownPlanets.push(planet.id);
+
+        let zones;
+
+        let hardZones = 0;
+        let mediumZones = 0;
+        let easyZones = 0;
+        let unknownZones = 0;
+
+        let hasBossZone = false;
+
+        while (!zones) {
+          zones = await _this.ApiGetPlanet(planet.id);
+        }
+
+        zones.zones.forEach(zone => {
+          if (zone['capture_progress'] && zone['capture_progress'] > 0.97 || zone['captured']) {
+            return;            
+          }
+
+          if (zone.type === 4) {
+            hasBossZone = true;
+          } else if (zone.type !== 3) {
+            logger(chalk.red(`!! Unknown zone type: ${zone.type}`));
+          }
+
+          switch (zone.difficulty) {
+            case 3:
+              hardZones += 1;
+              break;
+            case 2:
+              mediumZones += 1;
+              break;
+            case 1:
+              easyZones += 1;
+              break;
+            default:
+              unknownZones += 1;
+              break;
+          }
+        });
+
+        let capturedPercent = (zone.capture_progress * 100).toString() + '%';
+
+        logger(`>> Planet: ${chalk.green(planet.id)} - Hard: ${chalk.y(hardZones)} - Medium: ${chalk.green(mediumZones)} - Easy: ${chalk.green(easyZones)} - Captured: ${chalk.yellow(capturedPercent)} - Players: ${}`)
+      },
+      this,
+    );
+
+    // debug(this.knownPlanets);
+
+    /*
+    planets.forEach(planet => {
+      
+
+      let zones;
+
+      while (!zones) {
+        zones = await this.ApiGetPlanet(planet.id);
+      }
+
+      debug(zones);
+    });
+    */
+
+
+
+
     // while we haven't got a current planet
     while (!this.currentPlanetId) {
       // TODO try follow preferences of the user (ie; planets with appid they want or specific name??)
@@ -184,15 +289,25 @@ class SalienScript {
         throw new SalienScriptException("Didn't find any planets.");
       }
 
+      // debug(await planets);
+
       const firstOpen = planets.filter(planet => !planet.state.captured)[0];
+
       logger(chalk.green('[setupGame]'), 'First open planet id:', firstOpen.id);
+
       this.currentPlanetId = firstOpen.id;
     }
 
+
+
+
+
     // while the current planet is not the same as the steam planet
+    // while (this.currentPlanetId !== '') {
       // leave the current game
       // join the current planet
       // get the planet steam thinks we joined
+    // }
   }
 
   async gameLoop() {
