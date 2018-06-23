@@ -12,7 +12,7 @@
 
 ---
 
-## How to use this (download repo)
+## How to use this
 
 1. Install [Node.js](https://nodejs.org/en/). (Version 10 and above)
 2. Log into [Steam](http://store.steampowered.com/) in your browser.
