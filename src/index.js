@@ -173,6 +173,10 @@ class SalienScript {
   async setupGame() {
     debug(await this.ApiGetPlanets());
 
+    // TODO: the `meow` CLI doesn't exit gracefully on the new version
+    // of the script - figure out why
+    process.exit();
+
     // while we haven't got a current planet
       // TODO try follow preferences of the user (ie; planets with appid they want or specific name??)
       // TODO add an option to select going for the hardest difficulty only??
