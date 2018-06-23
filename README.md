@@ -2,7 +2,13 @@
 
 👽 Scripting the Steam Salien Sale minigame, the proper way.
 
-> A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw) with additional features
+> A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw) with additional features!
+
+[![salien-script-js on npm](https://nodei.co/npm/salien-script-js.png)](https://nodei.co/npm/salien-script-js/)
+
+[![CI Status](https://img.shields.io/travis/South-Paw/salien-script-js/rework.svg)](https://travis-ci.org/South-Paw/salien-script-js)
+[![Dependencies](https://david-dm.org/South-Paw/salien-script-js/rework.svg)](https://david-dm.org/South-Paw/salien-script-js/rework)
+[![Dev Dependencies](https://david-dm.org/South-Paw/salien-script-js/rework/dev-status.svg)](https://david-dm.org/South-Paw/salien-script-js/rework?type=dev)
 
 ---
 
