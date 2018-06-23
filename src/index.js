@@ -35,7 +35,7 @@ const logger = (...messages) => console.log(chalk.white(dateFormat(new Date(), '
 // eslint-disable-next-line no-console
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
 
-const asyncForEach = async (array, callback, _this) => {
+const asyncForEach = async (_this, array, callback) => {
   for (let index = 0; index < array.length; index += 1) {
     await callback(array[index], index, array, _this);
   }
@@ -63,6 +63,8 @@ class SalienScript {
     this.maxRetries = 2;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
+
+    this.tempPlanetId = null;
 
     this.currentPlanetId = null;
     this.knownPlanets = [];
@@ -199,6 +201,14 @@ class SalienScript {
     }
   }
 
+  async getFirstAvailablePlanet() {
+    const planets = await this.ApiGetPlanets();
+
+    if (!planets) {
+      throw new SalienScriptException("Didn't find any planets.");
+    }
+  }
+
   async setupGame() {
     const planets = await this.ApiGetPlanets();
 
@@ -206,9 +216,8 @@ class SalienScript {
       throw new SalienScriptException("Didn't find any planets.");
     }
 
-    await asyncForEach(
-      planets,
-      async (planet, index, array, _this) => {
+    try {
+      await asyncForEach(this, planets, async (planet, index, array, _this) => {
         _this.knownPlanets.push(planet.id);
 
         let zones;
@@ -218,15 +227,15 @@ class SalienScript {
         let easyZones = 0;
         let unknownZones = 0;
 
-        let hasBossZone = false;
+        let hasBossZone = true;
 
         while (!zones) {
           zones = await _this.ApiGetPlanet(planet.id);
         }
 
         zones.zones.forEach(zone => {
-          if (zone['capture_progress'] && zone['capture_progress'] > 0.97 || zone['captured']) {
-            return;            
+          if ((zone.capture_progress && zone.capture_progress > 0.97) || zone.captured) {
+            return;
           }
 
           if (zone.type === 4) {
@@ -251,32 +260,36 @@ class SalienScript {
           }
         });
 
-        let capturedPercent = (zone.capture_progress * 100).toString() + '%';
+        const capturedPercent = Number(planet.state.capture_progress * 100).toFixed(2).toString();
+        const planetName = planet.state.name.replace('#TerritoryControl_', '').split('_').join(' ');
 
-        logger(`>> Planet: ${chalk.green(planet.id)} - Hard: ${chalk.y(hardZones)} - Medium: ${chalk.green(mediumZones)} - Easy: ${chalk.green(easyZones)} - Captured: ${chalk.yellow(capturedPercent)} - Players: ${}`)
-      },
-      this,
-    );
+        logger(`>> Planet: ${chalk.green(planet.id)} - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)} - Easy: ${chalk.yellow(easyZones)} - Captured: ${chalk.yellow(capturedPercent)}% - Players: ${chalk.yellow(planet.state.current_players)} (${chalk.green(planetName)})`)
 
-    // debug(this.knownPlanets);
+        if (unknownZones) {
+          logger(`>> Unknown zones found: ${chalk.yellow(unknownZones)}`)
+        }
 
-    /*
-    planets.forEach(planet => {
-      
+        if (hasBossZone) {
+          // eslint-disable-next-line no-param-reassign
+          _this.currentPlanetId = planet.id;
 
-      let zones;
-
-      while (!zones) {
-        zones = await this.ApiGetPlanet(planet.id);
+          throw new SalienScriptException();
+        }
+      });
+    } catch (e) {
+      if (e.name === 'SalienScriptException') {
+        logger(chalk.green('>> This planet has a boss zone, selecting this planet'));
+      } else {
+        debug(e);
+        throw new SalienScriptException(e.message);
       }
+    }
 
-      debug(zones);
-    });
-    */
-
+    console.log(this.currentPlanetId);
 
 
 
+/*    
     // while we haven't got a current planet
     while (!this.currentPlanetId) {
       // TODO try follow preferences of the user (ie; planets with appid they want or specific name??)
@@ -297,7 +310,7 @@ class SalienScript {
 
       this.currentPlanetId = firstOpen.id;
     }
-
+*/
 
 
 
