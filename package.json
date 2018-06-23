@@ -37,6 +37,8 @@
     "prettier": "prettier --write \"src/**/*.js\""
   },
   "dependencies": {
+    "chalk": "^2.4.1",
+    "dateformat": "^3.0.3",
     "delay": "^3.0.0",
     "fetch-retry": "^1.2.1"
   },
