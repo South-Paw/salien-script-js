@@ -12,7 +12,21 @@
 
 ---
 
-## Easy setup
+## Installation
+
+### Prerequisites
+
+To run this script, you will need to install the following tools:
+
+- [Node.js](https://nodejs.org/en/) (Version 10 and above)
+
+### Getting your token
+
+Log into [Steam](http://store.steampowered.com/) in your browser. Once you're logged in, we can now get the token required for this script to work.
+
+Open the following URL: https://steamcommunity.com/saliengame/gettoken 
+
+You should be able to find the bit that looks like `"token":"xxxxxxxx"`. Copy whatever is inside the second quotes, (e.g. `xxxxxxxx`).
 
 1. Install the latest version [Node.js](https://nodejs.org/en/)
 2. Download this repository and extract somewhere
@@ -23,13 +37,43 @@
 6. Type `npm i` to get required dependencies
 7. Run the script by typing `node run.js xxxxxxxx` where `xxxxxxxx` is your token from step 4.
 
-### Multiple tokens/scripts
+### Using the command line
 
-Simply open another command line in the repository folder and type `node run.js yyyyyyyy` where `yyyyyyyy` is your other accounts token.
+Open PowerShell on Windows.
+
+> Tip: On Windows, Start > Run > type `powershell.exe` > Enter
+
+Use `npm` to install this project as a command-line tool.
+
+```bash
+npm install -g salien-script-js
+```
+
+To use this command-line, pass the `--token` option with the same token that you received from https://steamcommunity.com/saliengame/gettoken.
+
+```sh-session
+$ salien-script-js --help
+
+    Scripting the Steam Salien Sale minigame, the proper way.
+
+    Usage
+      $ salient-script-js [options]
+
+    Options
+      --token, -t     Your game token.
+      --group, -g      The ID of a steam group you'd like to represent. (optional)
+
+$ salien-script-js --token xxxxxxxx
+...
+```
 
 ### Represent your Steam Group
 
-If you'd like to represent a specific steam group, simply add the group id after your token, eg: `node run.js xxxxxxxx 123456789`
+If you'd like to represent a specific steam group, simply pass the `--group` option with the ID of the group.
+
+```sh-session
+$ salien-script-js --token xxxxxxxx --group 123456789
+```
 
 You can get your group id by going to https://steamcommunity.com/groups/YOUR_GROUP_NAME_HERE/memberslistxml/?xml=1 and replacing `YOUR_GROUP_NAME_HERE` with the group name shown at the end of your groups url.
 
