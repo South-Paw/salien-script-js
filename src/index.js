@@ -56,37 +56,37 @@ const getScoreForZone = (zone) => {
 };
 
 async function getFirstAvailablePlanetId() {
-  console.log('Attempting to get first open planet...');
+  this.logger('Attempting to get first open planet...');
 
   const request = await fetch(getUrl('ITerritoryControlMinigameService/GetPlanets/v0001', 'active_only=1'), getOptions());
   const response = await request.json();
 
   if (!response || !response.response.planets) {
-    console.log('Didn\'t find any planets.');
+    this.logger('Didn\'t find any planets.');
 
     return null;
   }
 
   const firstOpen = response.response.planets.filter(planet => !planet.state.captured)[0];
 
-  console.log('First open planet id:', firstOpen.id);
+  this.logger('First open planet id:', firstOpen.id);
 
   return firstOpen.id;
 };
 
 async function getPlayerInfo(token) {
-  console.log('Getting player info...');
+  this.logger('Getting player info...');
 
   const request = await fetch(getUrl('ITerritoryControlMinigameService/GetPlayerInfo/v0001', `access_token=${token}`), getOptions({ method: 'POST' }));
   const response = await request.json();
 
   if (!response || !response.response) {
-    console.log('Didn\'t get any player info.');
+    this.logger('Didn\'t get any player info.');
 
     return null;
   }
 
-  console.log('Got player info!');
+  this.logger('Got player info!');
 
   return response.response;
 };
@@ -95,7 +95,7 @@ async function leaveCurrentGame(token, leaveCurrentPlanet) {
   let playerInfo = null;
 
   while (!playerInfo) {
-    playerInfo = await getPlayerInfo(token);
+    playerInfo = await getPlayerInfo.call(this, token);
   }
 
   // Please do not change our clanid if you are going to use this script
@@ -105,21 +105,21 @@ async function leaveCurrentGame(token, leaveCurrentPlanet) {
   }
 
   while (!playerInfo) {
-    playerInfo = await getPlayerInfo(token);
+    playerInfo = await getPlayerInfo.call(this, token);
   }
 
   if (!playerInfo['clan_info'] || !playerInfo['clan_info']['accountid'] || playerInfo['clan_info']['accountid'] != 4777282) {
-    console.log('\nYou need to join the SteamDB group to use this script!\n');
-    console.log('https://steamcommunity.com/groups/SteamDB\n');
+    this.logger('\nYou need to join the SteamDB group to use this script!\n');
+    this.logger('https://steamcommunity.com/groups/SteamDB\n');
     process.exit(1);
   }
 
   if (playerInfo['active_zone_game']) {
-    console.log('Leaving `active_zone_game`...');
+    this.logger('Leaving `active_zone_game`...');
 
     await fetch(getUrl('IMiniGameService/LeaveGame/v0001', `access_token=${token}&gameid=${playerInfo['active_zone_game']}`), getOptions({ method: 'POST' }));
 
-    console.log('Success!');
+    this.logger('Success!');
   }
 
   if (!playerInfo['active_planet']) {
@@ -127,28 +127,28 @@ async function leaveCurrentGame(token, leaveCurrentPlanet) {
   }
 
   if (leaveCurrentPlanet) {
-    console.log('Leaving `active_planet`...');
+    this.logger('Leaving `active_planet`...');
 
     await fetch(getUrl('IMiniGameService/LeaveGame/v0001', `access_token=${token}&gameid=${playerInfo['active_planet']}`), getOptions({ method: 'POST' }));
 
-    console.log('Success!');
+    this.logger('Success!');
   }
 
   return playerInfo['active_planet'];
 }
 
 async function joinPlanet(token, planetId) {
-  console.log('Attempting to join planet id:', planetId);
+  this.logger('Attempting to join planet id:', planetId);
 
   await fetch(getUrl('ITerritoryControlMinigameService/JoinPlanet/v0001', `id=${planetId}&access_token=${token}`), getOptions({ method: 'POST' }));
 
-  console.log('Joined!');
+  this.logger('Joined!');
 
   return;
 }
 
 async function getFirstAvailableZone(planetId) {
-  console.log(`Requesting zones for planet ${planetId}...`);
+  this.logger(`Requesting zones for planet ${planetId}...`);
 
   const request = await fetch(getUrl('ITerritoryControlMinigameService/GetPlanet/v0001', `id=${planetId}`), getOptions());
   const response = await request.json();
@@ -169,7 +169,7 @@ async function getFirstAvailableZone(planetId) {
     if (zone.type === 4) {
       bossZone = zone;
     } else if (zone.type != 3) {
-      console.log('Unknown zone type:', zone.type);
+      this.logger('Unknown zone type:', zone.type);
     }
 
     if (zone['capture_progress'] < 0.95) {
@@ -197,24 +197,24 @@ async function getFirstAvailableZone(planetId) {
 }
 
 async function joinZone(token, position) {
-  console.log('Attempting to join zone position:', position);
+  this.logger('Attempting to join zone position:', position);
 
   const request = await fetch(getUrl('ITerritoryControlMinigameService/JoinZone/v0001', `zone_position=${position}&access_token=${token}`), getOptions({ method: 'POST' }));
   const response = await request.json();
 
   if (!response || !response.response['zone_info']) {
-    console.log('Failed to join a zone.');
+    this.logger('Failed to join a zone.');
 
     return null;
   }
 
-  console.log('Got player info!');
+  this.logger('Got player info!');
 
   return response.response;
 }
 
 async function reportScore(token, score) {
-  console.log('Attempting to send score...');
+  this.logger('Attempting to send score...');
 
   const request = await fetch(getUrl('ITerritoryControlMinigameService/ReportScore/v0001', `access_token=${token}&score=${score}&language=english`), getOptions({ method: 'POST' }));
   const response = await request.json();
@@ -222,73 +222,81 @@ async function reportScore(token, score) {
   if (response.response['new_score']) {
     const data = response.response;
 
-    console.log(`Score: ${data['old_score']} => ${data['new_score']} (next level: ${data['next_level_score']}) - Current level: ${data['new_level']}`);
+    this.logger(`Score: ${data['old_score']} => ${data['new_score']} (next level: ${data['next_level_score']}) - Current level: ${data['new_level']}`);
   }
 
   return;
 }
 
+const createLogger = (name) => {
+  if (name) {
+    return console.log.bind(console, `${name}:`);
+  }
+  return console.log;
+}
+
 class SalienScript {
-  constructor({ token }) {
+  constructor({ token, name }) {
     this.token = token;
     this.currentPlanetId = null;
+    this.logger = createLogger(name);
   }
 
   async run() {
-    console.log('This script will not work until you have joined our group:');
-    console.log('https://steamcommunity.com/groups/SteamDB');
+    this.logger('This script will not work until you have joined our group:');
+    this.logger('https://steamcommunity.com/groups/SteamDB');
 
     while (!this.currentPlanetId) {
-      this.currentPlanetId = await getFirstAvailablePlanetId();
+      this.currentPlanetId = await getFirstAvailablePlanetId.call(this);
 
       if (!this.currentPlanetId) {
-        console.log('Trying to get another PlanetId in 5 seconds...');
+        this.logger('Trying to get another PlanetId in 5 seconds...');
 
         await delay(5000);
       }
     }
 
-    await leaveCurrentGame(this.token, true);
+    await leaveCurrentGame.call(this, this.token, true);
 
-    await joinPlanet(this.token, this.currentPlanetId);
+    await joinPlanet.call(this, this.token, this.currentPlanetId);
 
-    this.currentPlanetId = await leaveCurrentGame(this.token, false);
+    this.currentPlanetId = await leaveCurrentGame.call(this, this.token, false);
 
     while (true) {
       let zone = null;
       let joinedZone = null;
 
       while (!zone) {
-        zone = await getFirstAvailableZone(this.currentPlanetId);
+        zone = await getFirstAvailableZone.call(this, this.currentPlanetId);
 
         if (!zone) {
-          console.log('Trying to get another ZoneId in 5 seconds...');
+          this.logger('Trying to get another ZoneId in 5 seconds...');
 
           await delay(5000);
         }
       }
 
       while (!joinedZone) {
-        console.log('Attempting to join zone:', zone['zone_position']);
+        this.logger('Attempting to join zone:', zone['zone_position']);
 
-        joinedZone = await joinZone(this.token, zone['zone_position']);
+        joinedZone = await joinZone.call(this, this.token, zone['zone_position']);
 
         if (!joinedZone) {
-          console.log('Trying to get another Zone Position in 15 seconds...');
+          this.logger('Trying to get another Zone Position in 15 seconds...');
 
           await delay(15000);
         }
       }
 
-      console.log(`Joined zone ${zone['zone_position']} - Captured: ${(zone['capture_progress'] * 100).toFixed(2)}% - Difficulty ${zone.difficulty}`);
+      this.logger(`Joined zone ${zone['zone_position']} - Captured: ${(zone['capture_progress'] * 100).toFixed(2)}% - Difficulty ${zone.difficulty}`);
 
-      console.log('Waiting 120 seconds for game to end...');
+      this.logger('Waiting 120 seconds for game to end...');
 
       await delay(120000);
 
-      console.log('Game complete!');
+      this.logger('Game complete!');
 
-      await reportScore(this.token, getScoreForZone(zone));
+      await reportScore.call(this, this.token, getScoreForZone(zone));
     }
   };
 }
