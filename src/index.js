@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+const chalk = require('chalk');
 const dateFormat = require('dateformat');
 const delay = require('delay');
 const fetch = require('fetch-retry');
