@@ -35,12 +35,6 @@ const logger = (...messages) => console.log(chalk.white(dateFormat(new Date(), '
 // eslint-disable-next-line no-console
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
 
-const asyncForEach = async (_this, array, callback) => {
-  for (let index = 0; index < array.length; index += 1) {
-    await callback(array[index], index, array, _this);
-  }
-};
-
 class SalienScriptException {
   constructor(message) {
     this.name = 'SalienScriptException';
@@ -190,9 +184,18 @@ class SalienScript {
     }
 
     try {
-      await asyncForEach(this, planets, async (planet, index, array, _this) => {
-        let zones;
+      // Patch the apiGetPlanets response with zones from apiGetPlanet
+      const mappedPlanets = await Promise.all(
+        planets.map(async planet => {
+          const object = Object.assign({}, planet);
 
+          const currentPlanet = await this.ApiGetPlanet(planet.id);
+          object.zones = currentPlanet.zones;
+          return object;
+        }),
+      );
+
+      mappedPlanets.forEach(planet => {
         let hardZones = 0;
         let mediumZones = 0;
         let easyZones = 0;
@@ -200,21 +203,18 @@ class SalienScript {
 
         let hasBossZone = false;
 
-        while (!zones) {
-          zones = await _this.ApiGetPlanet(planet.id);
+        // Filter out captured zones
+        const filterCaptured = planet.zones.filter(
+          zone => (zone.capture_progress && zone.capture_progress <= 0.97) || !zone.captured,
+        );
+
+        const filterBosses = filterCaptured.filter(zone => zone.type === 4);
+
+        if (filterBosses.length !== 0) {
+          hasBossZone = true;
         }
 
-        zones.zones.forEach(zone => {
-          if ((zone.capture_progress && zone.capture_progress > 0.97) || zone.captured) {
-            return;
-          }
-
-          if (zone.type === 4) {
-            hasBossZone = true;
-          } else if (zone.type !== 3) {
-            logger(chalk.red(`!! Unknown zone type: ${zone.type}`));
-          }
-
+        filterCaptured.filter(zone => zone.type === 3).forEach(zone => {
           switch (zone.difficulty) {
             case 3:
               hardZones += 1;
@@ -231,10 +231,9 @@ class SalienScript {
           }
         });
 
-        _this.knownPlanetIds.push(planet.id);
+        this.knownPlanetIds.push(planet.id);
 
-        // eslint-disable-next-line no-param-reassign
-        _this.knownPlanets[planet.id] = {
+        this.knownPlanets[planet.id] = {
           hardZones,
           mediumZones,
           easyZones,
@@ -265,19 +264,15 @@ class SalienScript {
 
         if (hasBossZone) {
           // eslint-disable-next-line no-param-reassign
-          _this.currentPlanetId = planet.id;
-
-          throw new SalienScriptException('Boss zone found!');
+          logger(chalk.green('>> This planet has a boss zone, selecting this planet'));
+          this.currentPlanetId = planet.id;
         }
       });
     } catch (e) {
-      if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
-        logger(chalk.green('>> This planet has a boss zone, selecting this planet'));
-      } else {
-        debug(e);
-        throw new SalienScriptException(e.message);
-      }
+      throw new SalienScriptException(e.message);
     }
+
+    // console.log(this.knownPlanets['6'].zones);
 
     if (!this.currentPlanetId) {
       // TODO allow people to select what zone to focus
