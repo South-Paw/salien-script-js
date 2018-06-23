@@ -48,12 +48,14 @@ class SalienScriptException {
   }
 }
 
+/*
 class SalienScriptRestart {
   constructor(message) {
     this.name = 'SalienScriptRestart';
     this.message = message;
   }
 }
+*/
 
 class SalienScript {
   constructor({ token, clan }) {
@@ -65,6 +67,7 @@ class SalienScript {
     this.defaultDelaySec = this.defaultDelayMs / 1000;
 
     this.currentPlanetId = null;
+    this.steamPlanetId = null;
     this.knownPlanetIds = [];
     this.knownPlanets = {};
     this.skippedPlanets = [];
@@ -182,6 +185,40 @@ class SalienScript {
     return response;
   }
 
+  async leaveCurrentGame(leaveCurrentPlanet = 0) {
+    let playerInfo;
+
+    while (!playerInfo) {
+      playerInfo = await this.ApiGetPlayerInfo();
+    }
+
+    if (playerInfo.active_zone_game) {
+      await this.ApiLeaveGame(playerInfo.active_zone_game);
+    }
+
+    playerInfo = null;
+
+    while (!playerInfo) {
+      playerInfo = await this.ApiGetPlayerInfo();
+    }
+
+    if (!playerInfo.active_planet) {
+      return 0;
+    }
+
+    const activePlanet = playerInfo.active_planet;
+
+    if (leaveCurrentPlanet > 0 && leaveCurrentPlanet !== activePlanet) {
+      logger(
+        `Leaving planet ${chalk.yellow(activePlanet)}, because we want to be on ${chalk.yellow(leaveCurrentPlanet)}`,
+      );
+
+      await this.ApiLeaveGame(activePlanet);
+    }
+
+    return activePlanet;
+  }
+
   async setupGame() {
     const planets = await this.ApiGetPlanets();
 
@@ -255,7 +292,8 @@ class SalienScript {
         let logMsg = `>> Planet: ${chalk.green(planet.id)}`;
         logMsg += ` - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)}`;
         logMsg += ` - Easy: ${chalk.yellow(easyZones)} - Captured: ${chalk.yellow(capturedPercent)}%`;
-        logMsg += ` - Players: ${chalk.yellow(planet.state.current_players)} (${chalk.green(planetName)})`;
+        logMsg += ` - Players: ${chalk.yellow(planet.state.current_players.toLocaleString())}`;
+        logMsg += ` (${chalk.green(planetName)})`;
 
         logger(logMsg);
 
@@ -326,56 +364,30 @@ class SalienScript {
             this.currentPlanetId = planetId;
           }
         });
-
-        if (this.currentPlanetId) {
-          return;
-        }
       }
 
-      // If there are no planets with hard or medium zones, just return first one
-      this.currentPlanetId = planets[0].id;
+      if (!this.currentPlanetId) {
+        // If there are no planets with hard or medium zones, just return first one
+        this.currentPlanetId = planets[0].id;
+      }
     }
 
-    // while the current planet is not the same as the steam planet
-    // while (this.currentPlanetId !== '') {
-      // leave the current game
-      // join the current planet
-      // get the planet steam thinks we joined
-    // }
+    while (this.currentPlanetId !== this.steamPlanetId) {
+      // Leave current game before trying to switch planets (it will report InvalidState otherwise)
+      this.steamPlanetId = await this.leaveCurrentGame(this.currentPlanetId);
+
+      if (this.currentPlanetId !== this.steamPlanetId) {
+        await this.ApiJoinPlanet(this.currentPlanetId);
+
+        this.steamPlanetId = await this.leaveCurrentGame();
+      }
+    }
   }
 
   async gameLoop() {
+    console.log('currentPlanetId', this.currentPlanetId);
+
     throw new SalienScriptException(`gameLoop() not yet implemented`);
-
-    // if last restart was greater than an hour ago
-      // change planet
-
-    // leave the current game to avoid getting stuck
-
-    // while !zone
-      // join first avaliable zone
-
-    // if there are no zones
-      // add planet to skip list
-      // restart
-
-    // if there are no hard zones left
-      // restart
-
-    // try to join a zone
-      // restart if failed
-
-    // log current zone info
-      // planet
-      // zone
-      // top clans (if exists)
-
-    // sleep for 110 seconds
-
-    // send reportScore
-
-    // if we get a new_score
-      // log current user stats
   }
 
   async init() {
