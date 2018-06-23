@@ -12,17 +12,30 @@
 
 ---
 
-## How to use this (download repo)
+## Easy setup
 
-1. Log into Steam in your browser
-2. Join https://steamcommunity.com/groups/SteamDB (needed to represent captures)
-3. Open https://steamcommunity.com/saliengame/gettoken and find the bit that looks like `"token":"xxxxxxxx"`
-4. Create a new file next to `run.js`, call it `token.txt` and paste only the `xxxxxxxx` part of your token in
-5. Install the latest version [Node.js](https://nodejs.org/en/)
-6. Open command line in the folder
+1. Install the latest version [Node.js](https://nodejs.org/en/)
+2. Download this repository and extract somewhere
+3. Log into [Steam](http://store.steampowered.com/) in your browser
+4. Open https://steamcommunity.com/saliengame/gettoken and find the bit that looks like `"token":"xxxxxxxx"`
+5. Open command line in the extracted repository folder
     * Tip: ['Shift + Right Click' in explorer -> 'Open Command Line/Powershell here'](http://i.imgur.com/6FJcydX.png)
-7. Type `npm i` to get dependencies
-8. Run the script by typing `node run.js`
+6. Type `npm i` to get required dependencies
+7. Run the script by typing `node run.js xxxxxxxx` where `xxxxxxxx` is your token from step 4.
+
+### Multiple tokens/scripts
+
+Simply open another command line in the repository folder and type `node run.js yyyyyyyy` where `yyyyyyyy` is your other accounts token.
+
+### Represent your Steam Group
+
+If you'd like to represent a specific steam group, simply add the group id after your token, eg: `node run.js xxxxxxxx 123456789`
+
+You can get your group id by going to https://steamcommunity.com/groups/YOUR_GROUP_NAME_HERE/memberslistxml/?xml=1 and replacing `YOUR_GROUP_NAME_HERE` with the group name shown at the end of your groups url.
+
+**You must be a member of a group to represent that group!**
+
+If you'd like to team up with an established larger group please consider using either [SteamDB](https://steamcommunity.com/groups/steamdb) `103582791434298690` or [100Pals](https://steamcommunity.com/groups/100pals) `103582791454524084`
 
 ## Advanced: Usage as an npm package
 
