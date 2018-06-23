@@ -35,6 +35,12 @@ const logger = (...messages) => console.log(chalk.white(dateFormat(new Date(), '
 // eslint-disable-next-line no-console
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
 
+const asyncForEach = async (_this, array, callback) => {
+  for (let index = 0; index < array.length; index += 1) {
+    await callback(array[index], index, array, _this);
+  }
+};
+
 class SalienScriptException {
   constructor(message) {
     this.name = 'SalienScriptException';
@@ -50,12 +56,18 @@ class SalienScriptRestart {
 }
 
 class SalienScript {
-  constructor({ token }) {
+  constructor({ token, clan }) {
     this.token = token;
+    this.clan = clan;
 
     this.maxRetries = 2;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
+
+    this.currentPlanetId = null;
+    this.knownPlanetIds = [];
+    this.knownPlanets = {};
+    this.skippedPlanets = [];
   }
 
   async RequestAPI(method, params, maxRetries, additionalOptions = {}) {
@@ -124,10 +136,10 @@ class SalienScript {
   async ApiGetPlanet(planetId) {
     const response = await this.RequestAPI(
       'ITerritoryControlMinigameService/GetPlanet',
-      [`id=${planetId}`],
+      [`id=${planetId}`, 'language=english'],
       this.maxRetries,
     );
-    return response;
+    return response.planets[0];
   }
 
   async ApiGetPlayerInfo() {
@@ -171,20 +183,170 @@ class SalienScript {
   }
 
   async setupGame() {
-    debug(await this.ApiGetPlanets());
+    const planets = await this.ApiGetPlanets();
 
-    // while we haven't got a current planet
-      // TODO try follow preferences of the user (ie; planets with appid they want or specific name??)
-      // TODO add an option to select going for the hardest difficulty only??
-      // get first avaliable planet
+    if (!planets) {
+      throw new SalienScriptException("Didn't find any planets.");
+    }
+
+    try {
+      await asyncForEach(this, planets, async (planet, index, array, _this) => {
+        let zones;
+
+        let hardZones = 0;
+        let mediumZones = 0;
+        let easyZones = 0;
+        let unknownZones = 0;
+
+        let hasBossZone = false;
+
+        while (!zones) {
+          zones = await _this.ApiGetPlanet(planet.id);
+        }
+
+        zones.zones.forEach(zone => {
+          if ((zone.capture_progress && zone.capture_progress > 0.97) || zone.captured) {
+            return;
+          }
+
+          if (zone.type === 4) {
+            hasBossZone = true;
+          } else if (zone.type !== 3) {
+            logger(chalk.red(`!! Unknown zone type: ${zone.type}`));
+          }
+
+          switch (zone.difficulty) {
+            case 3:
+              hardZones += 1;
+              break;
+            case 2:
+              mediumZones += 1;
+              break;
+            case 1:
+              easyZones += 1;
+              break;
+            default:
+              unknownZones += 1;
+              break;
+          }
+        });
+
+        _this.knownPlanetIds.push(planet.id);
+
+        // eslint-disable-next-line no-param-reassign
+        _this.knownPlanets[planet.id] = {
+          hardZones,
+          mediumZones,
+          easyZones,
+          unknownZones,
+          hasBossZone,
+          ...planet,
+        };
+
+        const capturedPercent = Number(planet.state.capture_progress * 100)
+          .toFixed(2)
+          .toString();
+
+        const planetName = planet.state.name
+          .replace('#TerritoryControl_', '')
+          .split('_')
+          .join(' ');
+
+        let logMsg = `>> Planet: ${chalk.green(planet.id)}`;
+        logMsg += ` - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)}`;
+        logMsg += ` - Easy: ${chalk.yellow(easyZones)} - Captured: ${chalk.yellow(capturedPercent)}%`;
+        logMsg += ` - Players: ${chalk.yellow(planet.state.current_players)} (${chalk.green(planetName)})`;
+
+        logger(logMsg);
+
+        if (unknownZones) {
+          logger(`>> Unknown zones found: ${chalk.yellow(unknownZones)}`);
+        }
+
+        if (hasBossZone) {
+          // eslint-disable-next-line no-param-reassign
+          _this.currentPlanetId = planet.id;
+
+          throw new SalienScriptException('Boss zone found!');
+        }
+      });
+    } catch (e) {
+      if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
+        logger(chalk.green('>> This planet has a boss zone, selecting this planet'));
+      } else {
+        debug(e);
+        throw new SalienScriptException(e.message);
+      }
+    }
+
+    if (!this.currentPlanetId) {
+      // TODO allow people to select what zone to focus
+      //  * either by hardest or eaiest
+      //  * by what steam appIds are on each planet
+
+      this.knownPlanetIds.sort((a, b) => {
+        const planetA = this.knownPlanets[a];
+        const planetB = this.knownPlanets[b];
+
+        if (planetB.hardZones === planetA.hardZones) {
+          if (planetB.mediumZones === planetA.mediumZones) {
+            // If the hard and medium zones are equal, sort by most capture progress
+            return planetB.state.capture_progress - planetA.state.capture_progress;
+          }
+
+          // If the hard zones are equal, sort by most medium zones
+          return planetB.mediumZones - planetA.mediumZones;
+        }
+
+        // Sort planets by least amount of hard zones
+        return planetA.hard_zones - planetB.hard_zones;
+      });
+
+      // FIXME this logic might be able to be cleaned up
+      const priorities = ['hardZones', 'mediumZones'];
+
+      // Loop twice - first loop tries to find planet with hard zones, second loop - medium zones
+      for (let i = 0; i < priorities.length; i += 1) {
+        // eslint-disable-next-line no-loop-func
+        this.knownPlanetIds.forEach(planetId => {
+          const planet = this.knownPlanets[planetId];
+
+          if (this.skippedPlanets.includes(planetId) || !planet[priorities[i]]) {
+            return;
+          }
+
+          if (!planet.state.captured && !this.currentPlanetId) {
+            const planetName = planet.state.name
+              .replace('#TerritoryControl_', '')
+              .split('_')
+              .join(' ');
+
+            logger(`>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
+
+            this.currentPlanetId = planetId;
+          }
+        });
+
+        if (this.currentPlanetId) {
+          return;
+        }
+      }
+
+      // If there are no planets with hard or medium zones, just return first one
+      this.currentPlanetId = planets[0].id;
+    }
 
     // while the current planet is not the same as the steam planet
+    // while (this.currentPlanetId !== '') {
       // leave the current game
       // join the current planet
       // get the planet steam thinks we joined
+    // }
   }
 
   async gameLoop() {
+    throw new SalienScriptException(`gameLoop() not yet implemented`);
+
     // if last restart was greater than an hour ago
       // change planet
 
@@ -217,6 +379,12 @@ class SalienScript {
   }
 
   async init() {
+    // Reset all variables to default values every time init() is called
+    this.currentPlanetId = null;
+    this.knownPlanetIds = [];
+    this.knownPlanets = {};
+    this.skippedPlanets = [];
+
     try {
       logger(chalk.bgGreen(` Started SalienScript | Version: ${pkgVersion} `));
 
@@ -228,6 +396,8 @@ class SalienScript {
       }
     } catch (e) {
       logger(chalk.bgRed(`${e.name}:`), chalk.red(e.message));
+      debug(e);
+
       logger(chalk.bgMagenta(`Script will restart in ${this.defaultDelaySec} seconds...\n\n`));
 
       await delay(this.defaultDelayMs);
