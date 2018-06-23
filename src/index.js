@@ -163,6 +163,7 @@ class SalienScript {
 
     // while we haven't got a current planet
       // TODO try follow preferences of the user (ie; planets with appid they want or specific name??)
+      // TODO add an option to select going for the hardest difficulty only??
       // get first avaliable planet
 
     // while the current planet is not the same as the steam planet
@@ -215,7 +216,9 @@ class SalienScript {
       }
     } catch (e) {
       logger(chalk.bgRed(`${e.name}:`), chalk.red(e.message));
-      logger(chalk.bgMagenta('Script will now restart...\n\n'));
+      logger(chalk.bgMagenta(`Script will restart in ${this.defaultDelaySec} seconds...\n\n`));
+
+      await delay(this.defaultDelayMs);
 
       this.init();
     }
