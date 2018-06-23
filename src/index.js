@@ -268,14 +268,14 @@ class SalienScript {
           }
         });
 
-        this.knownPlanets.set(planet.id, {
+        this.knownPlanets[planet.id] = {
           hardZones,
           mediumZones,
           easyZones,
           unknownZones,
           hasBossZone,
           ...planet,
-        });
+        };
 
         this.knownPlanetIds.push(planet.id);
 
