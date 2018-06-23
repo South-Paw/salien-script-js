@@ -172,12 +172,22 @@ class SalienScript {
   }
 
   async setupGame() {
-    debug(await this.ApiGetPlanets());
-
     // while we haven't got a current planet
+    while (!this.currentPlanetId) {
       // TODO try follow preferences of the user (ie; planets with appid they want or specific name??)
       // TODO add an option to select going for the hardest difficulty only??
+
       // get first avaliable planet
+      const planets = await this.ApiGetPlanets();
+
+      if (!planets) {
+        throw new SalienScriptException("Didn't find any planets.");
+      }
+
+      const firstOpen = planets.filter(planet => !planet.state.captured)[0];
+      logger(chalk.green('[setupGame]'), 'First open planet id:', firstOpen.id);
+      this.currentPlanetId = firstOpen.id;
+    }
 
     // while the current planet is not the same as the steam planet
       // leave the current game
