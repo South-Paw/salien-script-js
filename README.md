@@ -12,51 +12,20 @@
 
 ---
 
-## Installation
+## How to use this (download repo)
 
-### Prerequisites
+1. Install [Node.js](https://nodejs.org/en/). (Version 10 and above)
+2. Log into [Steam](http://store.steampowered.com/) in your browser.
+3. Open the following URL: <https://steamcommunity.com/saliengame/gettoken>. You should be able to find the bit that looks like `"token":"xxxxxxxx"`. Copy whatever is inside the second quotes, (e.g. `xxxxxxxx`).
+4. Open PowerShell on Windows. (Tip: Start > Run > type `powershell.exe` > Enter)
+5. Run `npm install -g salien-script-js` to install this project as a command-line.
+7. Run the script by typing `salien-script-js --token xxxxxxxx` where `xxxxxxxx` is your token from step 3.
 
-To run this script, you will need to install the following tools:
+### Multiple tokens/scripts	### Using the command line
 
-- [Node.js](https://nodejs.org/en/) (Version 10 and above)
+Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy` where `yyyyyyyy` is your other accounts token.
 
-### Getting your token
-
-Log into [Steam](http://store.steampowered.com/) in your browser. Once you're logged in, we can now get the token required for this script to work.
-
-Open the following URL: https://steamcommunity.com/saliengame/gettoken 
-
-You should be able to find the bit that looks like `"token":"xxxxxxxx"`. Copy whatever is inside the second quotes, (e.g. `xxxxxxxx`).
-
-### Using the command line
-
-Open PowerShell on Windows.
-
-> Tip: On Windows, Start > Run > type `powershell.exe` > Enter
-
-Use `npm` to install this project as a command-line tool.
-
-```sh-session
-$ npm install -g salien-script-js
-$ salien-script-js --help
-
-    Scripting the Steam Salien Sale minigame, the proper way.
-
-    Usage
-      $ salient-script-js [options]
-
-    Options
-      --token, -t     Your game token.
-      --group, -g      The ID of a steam group you'd like to represent. (optional)
-```
-
-To use this command-line, pass the `--token` option with the same token that you received from https://steamcommunity.com/saliengame/gettoken.
-
-```sh-session
-$ salien-script-js --token xxxxxxxx
-```
-
-### Represent your Steam Group
+### Represent your Steam Group (Optional)
 
 If you'd like to represent a specific steam group, simply pass the `--group` option with the ID of the group.
 
