@@ -21,11 +21,20 @@
       "name": "Alex Gabites",
       "email": "hello@southpaw.co.nz",
       "url": "http://southpaw.co.nz/"
+    },
+    {
+      "name": "Resi Respati",
+      "email": "resir014@gmail.com",
+      "url": "https://resir014.xyz/"
     }
   ],
   "files": [
-    "src"
+    "src",
+    "cli.js"
   ],
+  "bin": {
+    "salien-script-js": "cli.js"
+  },
   "main": "src/index.js",
   "repository": {
     "type": "git",
@@ -33,7 +42,8 @@
   },
   "dependencies": {
     "delay": "^3.0.0",
-    "fetch-retry": "^1.2.1"
+    "fetch-retry": "^1.2.1",
+    "meow": "^5.0.0"
   },
   "devDependencies": {}
 }

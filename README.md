@@ -18,6 +18,31 @@
 7. Type `npm i` to get dependencies
 8. Run the script by typing `node run.js`
 
+## Basic: As a command-line
+
+The `cli.js` contains a command-line helper for this script. You can install this as follows:
+
+```bash
+npm install -g salien-script-js
+```
+
+To use this command-line, pass the `--token` option with the same token that you received from https://steamcommunity.com/saliengame/gettoken.
+
+```sh-session
+$ salien-script-js --help
+
+  Scripting the Steam Salien Sale minigame, the proper way.
+
+  Usage
+    $ salient-script-js [options]
+
+  Options
+    --token, -t     Your game token.
+
+$ node cli.js --token <token>
+...
+```
+
 ## Advanced: Usage as an npm package
 
 ```js
