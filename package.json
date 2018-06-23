@@ -31,9 +31,21 @@
     "type": "git",
     "url": "https://github.com/South-Paw/salien-script-js.git"
   },
+  "scripts": {
+    "lint": "eslint ./src",
+    "prepublishOnly": "npm run lint",
+    "prettier": "prettier --write \"src/**/*.js\""
+  },
   "dependencies": {
     "delay": "^3.0.0",
     "fetch-retry": "^1.2.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "prettier": "^1.13.5"
+  }
 }

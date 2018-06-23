@@ -2,7 +2,7 @@
 
 👽 Scripting the Steam Salien Sale minigame, the proper way.
 
-> A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw)
+> A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw) with additional features
 
 ---
 
@@ -31,8 +31,3 @@ const salien = new SalienScript(config);
 
 salien.run();
 ```
-
-## Other scripts Salien and languages
-
-* [PHP version by xPaw](https://github.com/SteamDatabase/SalienCheat) (original)
-* [Python version](https://github.com/SteamDatabase/SalienCheat)
