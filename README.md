@@ -12,24 +12,26 @@
 
 ---
 
-## Easy setup
+## How to use this
 
-1. Install the latest version [Node.js](https://nodejs.org/en/)
-2. Download this repository and extract somewhere
-3. Log into [Steam](http://store.steampowered.com/) in your browser
-4. Open https://steamcommunity.com/saliengame/gettoken and find the bit that looks like `"token":"xxxxxxxx"`
-5. Open command line in the extracted repository folder
-    * Tip: ['Shift + Right Click' in explorer -> 'Open Command Line/Powershell here'](http://i.imgur.com/6FJcydX.png)
-6. Type `npm i` to get required dependencies
-7. Run the script by typing `node run.js xxxxxxxx` where `xxxxxxxx` is your token from step 4.
+1. Install [Node.js](https://nodejs.org/en/). (Version 10 and above)
+2. Log into [Steam](http://store.steampowered.com/) in your browser.
+3. Open the following URL: <https://steamcommunity.com/saliengame/gettoken>. You should be able to find the bit that looks like `"token":"xxxxxxxx"`. Copy whatever is inside the second quotes, (e.g. `xxxxxxxx`).
+4. Open PowerShell on Windows. (Tip: Start > Run > type `powershell.exe` > Enter)
+5. Run `npm install -g salien-script-js` to install this project.
+6. Run the script by typing `salien-script-js --token xxxxxxxx` where `xxxxxxxx` is your token from step 3.
 
 ### Multiple tokens/scripts
 
-Simply open another command line in the repository folder and type `node run.js yyyyyyyy` where `yyyyyyyy` is your other accounts token.
+Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy` where `yyyyyyyy` is your other accounts token.
 
-### Represent your Steam Group
+### Represent your Steam Group (Optional)
 
-If you'd like to represent a specific steam group, simply add the group id after your token, eg: `node run.js xxxxxxxx 123456789`
+If you'd like to represent a specific steam group, simply pass the `--group` option with the ID of the group.
+
+```sh-session
+$ salien-script-js --token xxxxxxxx --group 123456789
+```
 
 You can get your group id by going to https://steamcommunity.com/groups/YOUR_GROUP_NAME_HERE/memberslistxml/?xml=1 and replacing `YOUR_GROUP_NAME_HERE` with the group name shown at the end of your groups url.
 
