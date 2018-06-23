@@ -241,17 +241,17 @@ class SalienScript {
         let hasBossZone = false;
 
         // Filter out captured zones
-        const filterCaptured = planet.zones.filter(
-          zone => (zone.capture_progress && zone.capture_progress <= 0.97) || !zone.captured,
-        );
+        planet.zones.forEach(zone => {
+          if ((zone.capture_progress && zone.capture_progress > 0.97) || zone.captured) {
+            return;
+          }
 
-        const filterBosses = filterCaptured.filter(zone => zone.type === 4);
+          if (zone.type === 4) {
+            hasBossZone = true;
+          } else if (zone.type !== 3) {
+            logger(chalk.red(`!! Unknown zone type: ${zone.type}`));
+          }
 
-        if (filterBosses.length !== 0) {
-          hasBossZone = true;
-        }
-
-        filterCaptured.filter(zone => zone.type === 3).forEach(zone => {
           switch (zone.difficulty) {
             case 3:
               hardZones += 1;
@@ -268,16 +268,16 @@ class SalienScript {
           }
         });
 
-        this.knownPlanetIds.push(planet.id);
-
-        this.knownPlanets[planet.id] = {
+        this.knownPlanets.set(planet.id, {
           hardZones,
           mediumZones,
           easyZones,
           unknownZones,
           hasBossZone,
           ...planet,
-        };
+        });
+
+        this.knownPlanetIds.push(planet.id);
 
         const capturedPercent = Number(planet.state.capture_progress * 100)
           .toFixed(2)
@@ -310,14 +310,12 @@ class SalienScript {
       throw new SalienScriptException(e.message);
     }
 
-    // console.log(this.knownPlanets['6'].zones);
-
     if (!this.currentPlanetId) {
       // TODO allow people to select what zone to focus
       //  * either by hardest or eaiest
       //  * by what steam appIds are on each planet
 
-      this.knownPlanetIds.sort((a, b) => {
+      const sortedPlanets = this.knownPlanetIds.sort((a, b) => {
         const planetA = this.knownPlanets[a];
         const planetB = this.knownPlanets[b];
 
@@ -341,7 +339,7 @@ class SalienScript {
       // Loop twice - first loop tries to find planet with hard zones, second loop - medium zones
       for (let i = 0; i < priorities.length; i += 1) {
         // eslint-disable-next-line no-loop-func
-        this.knownPlanetIds.forEach(planetId => {
+        sortedPlanets.forEach(planetId => {
           const planet = this.knownPlanets[planetId];
 
           if (this.skippedPlanets.includes(planetId) || !planet[priorities[i]]) {
