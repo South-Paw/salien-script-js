@@ -18,7 +18,7 @@
 2. Log into [Steam](http://store.steampowered.com/) in your browser.
 3. Open the following URL: <https://steamcommunity.com/saliengame/gettoken>. You should be able to find the bit that looks like `"token":"xxxxxxxx"`. Copy whatever is inside the second quotes, (e.g. `xxxxxxxx`).
 4. Open PowerShell on Windows. (Tip: Start > Run > type `powershell.exe` > Enter)
-5. Run `npm install -g salien-script-js` to install this project as a command-line.
+5. Run `npm install -g salien-script-js` to install this project.
 6. Run the script by typing `salien-script-js --token xxxxxxxx` where `xxxxxxxx` is your token from step 3.
 
 ### Multiple tokens/scripts
