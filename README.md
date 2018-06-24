@@ -63,6 +63,7 @@ If you'd like to team up with an established larger group please consider using 
 * [100Pals](https://steamcommunity.com/groups/100pals) id: `103582791454524084`
 * [SteamDB](https://steamcommunity.com/groups/steamdb) id: `103582791434298690`
 * [/r/saliens](https://steamcommunity.com/groups/summersaliens) id: `103582791462557324`
+* [Steam Universe](https://steamcommunity.com/groups/steamuniverse) id: `103582791434672565`
 
 ### 👥 Multiple tokens/scripts
 
