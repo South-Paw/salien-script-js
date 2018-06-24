@@ -742,10 +742,10 @@ class SalienScript {
           chalk.magenta("You're running the latest version!"),
         );
       }
-    }
 
-    // pause for 3 seconds after update check
-    await delay(3000);
+      // pause for 3 seconds after update check
+      await delay(3000);
+    }
 
     try {
       logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}`);
