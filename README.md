@@ -13,12 +13,14 @@
 
 ## 🌈 Features
 
-* Easy to install, run and update 🎉
-* Update checker and log notifications ✉️
-* Same logic as the [PHP version](https://github.com/SteamDatabase/SalienCheat) (we almost have parity) 👽
-* Pick your own steam group 👌
-* Works well with multiple tokens/scripts 👥
-* Name your running scripts 👀
+* 🎉 Easy to install, run and update
+* ✉️ Update checker and log notifications
+* 👽 Same logic as the [PHP version](https://github.com/SteamDatabase/SalienCheat) (we almost have parity)
+* 👌 Pick your own steam group
+* 👥 Works well with multiple tokens/scripts
+* 👀 Name your running scripts
+* 🐳 Docker support
+* ☁️ Heroku support
 
 > Note: We'll try our best to keep this version up to date with the PHP and other versions! Suggestions welcome.
 
@@ -68,7 +70,9 @@ If you'd like to team up with an established larger group please consider using 
 
 Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy --name "name of this script"` where `yyyyyyyy` is your other accounts token and `name of this script` if what you'd like to see in the log outputs.
 
-## Advanced: Usage as an npm package
+---
+
+## Advanced: 📦 Usage as an npm package
 
 ```js
 const SalienScript = require('salien-script-js');
@@ -84,7 +88,7 @@ const salien = new SalienScript(config);
 salien.init();
 ```
 
-## Advanced: Deploying to heroku
+## Advanced: ☁️ Deploying to heroku
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
@@ -92,10 +96,44 @@ salien.init();
 2. Set SALIEN_CONFIG ("token1:group1:name1;token2:group2:name2...").
 3. All done. For now, there is no way to update script easily without re-creating heroku app or manually pulling upstream changes into heroku repo.
 
-## Development
+---
+
+## 👨‍💻 Contributing and Development
 
 Want to help out? Awesome! 👍
 
 Pull the repo and you can run the script with `node cli.js -t TOKEN`.
 
 PRs, suggestions, fixes and improvements all welcome.
+
+---
+
+## License
+
+This project is licensed under [MIT](https://github.com/South-Paw/salien-script-js/blob/master/LICENSE)
+
+```
+MIT License
+
+Copyright (c) 2018 Alex Gabites
+
+https://github.com/South-Paw/salien-script-js
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
