@@ -29,7 +29,6 @@ const fetch = require('fetch-retry');
 
 const { version: pkgVersion } = require('../package.json');
 
-// eslint-disable-next-line no-console
 const logger = (name, ...messages) => {
   let message = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
 
@@ -37,6 +36,7 @@ const logger = (name, ...messages) => {
     message += ` (${name})`;
   }
 
+  // eslint-disable-next-line no-console
   console.log(message, ...messages);
 };
 
@@ -158,13 +158,13 @@ class SalienScript {
         // TODO there is some error handling/messaging we could implement here
         // see: https://github.com/SteamDatabase/SalienCheat/blob/ac3a28aeb0446ff80cf6a6e1370fd5ef42e75aa2/cheat.php#L533
 
-        logger(this.name, chalk.bgRed(`${e.name}:`), chalk.red(`For ${method}`));
+        logger(this.name, `   ${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`);
         debug(e);
 
         retries += 1;
 
         if (retries < maxRetries) {
-          logger(this.name, chalk.yellow(`Retrying ${method} in ${this.defaultDelaySec} seconds...`));
+          logger(this.name, chalk.yellow(`   Retrying ${method} in ${this.defaultDelaySec} seconds...`));
         } else {
           throw new SalienScriptException(`Failed ${method} after ${retries} retries`);
         }
@@ -245,17 +245,12 @@ class SalienScript {
   }
 
   async ApiReportScore(score) {
-    // try catch, return null if failed
     const response = await this.RequestAPI(
       'ITerritoryControlMinigameService/ReportScore',
       [`access_token=${this.token}`, `score=${score}`, `language=english`],
-      1,
+      this.maxRetries,
       { method: 'POST' },
     );
-
-    // will need some additional logic to avoid restarting the app when the report score fails...
-    console.log(await response);
-
     return response;
   }
 
@@ -652,7 +647,7 @@ class SalienScript {
       logger(this.name, `-- Top Clans:${zoneInfo.top_clans.map(({ name }) => ` ${name}`)}`);
     }
 
-    logger(this.name, `   ${chalk.bgMagenta(`Waiting ${this.waitTime} seconds for game to finish...`)}`);
+    logger(this.name, `   ${chalk.bgMagenta(`Waiting ${this.waitTime} seconds for round to finish...`)}`);
 
     await delay(this.waitTime * 1000);
 
@@ -662,8 +657,7 @@ class SalienScript {
       const earnedXp = report.new_score - report.old_score;
       const nextLevelPercent = ((report.new_score / report.next_level_score) * 100).toFixed(2);
 
-      let currentLevelMsg = `>> Scored: ${chalk.green(getScoreForZone(zone))}`;
-      currentLevelMsg += ` - XP Earned: ${chalk.green(earnedXp.toLocaleString())}`;
+      let currentLevelMsg = `>> XP Earned: ${chalk.green(earnedXp.toLocaleString())}`;
       currentLevelMsg += ` (${chalk.yellow(report.old_score.toLocaleString())} XP`;
       currentLevelMsg += `=> ${chalk.green(report.new_score.toLocaleString())} XP)`;
       currentLevelMsg += ` - Current Level: ${chalk.green(report.new_level)} (${nextLevelPercent}% to next)`;
