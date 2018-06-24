@@ -539,12 +539,16 @@ class SalienScript {
         }
 
         if (hasBossZone) {
-          logger(this.name, chalk.green('>> This planet has a boss zone, selecting this planet'));
           this.currentPlanetId = planet.id;
+          throw new SalienScriptException('Boss zone found!');
         }
       });
     } catch (e) {
-      throw new SalienScriptException(e.message);
+      if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
+        logger(this.name, chalk.green('>> This planet has a boss zone, selecting this planet'));
+      } else {
+        throw new SalienScriptException(e.message);
+      }
     }
 
     // FIXME this logic might be able to be cleaned up
