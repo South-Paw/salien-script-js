@@ -15,14 +15,12 @@
 ## 🌈 Features
 
 * Easy to install, run and update 🎉
-* Same logic as the [PHP version](https://github.com/SteamDatabase/SalienCheat) 👽
+* Same logic as the [PHP version](https://github.com/SteamDatabase/SalienCheat) (we almost have parity) 👽
 * Pick your own steam group 👌
 * Works well with multiple tokens/scripts 👥
 * Name your running scripts 👀
 
-> Note: We'll try our best to keep this version up to date with the PHP version!
->
-> Right now, they almost have parity in what they do.
+> Note: We'll try our best to keep this version up to date with the PHP and other versions! Suggestions welcome.
 
 ---
 
@@ -34,6 +32,8 @@
 4. Open PowerShell on Windows. (Tip: Start > Run > type `powershell.exe` > Enter)
 5. Run `npm install -g salien-script-js` to install this project.
 6. Run the script by typing `salien-script-js --token xxxxxxxx` where `xxxxxxxx` is your token from step 3.
+
+> ### If you appreciate the script, please leave a star ⭐ on the project!
 
 ## 😍 How to update the script
 
