@@ -111,6 +111,7 @@ class SalienScript {
 
     this.startTime = null;
     this.waitTime = 110;
+    this.hasJoinedClan = false;
 
     this.currentPlanetId = null;
     this.steamPlanetId = null;
@@ -265,10 +266,26 @@ class SalienScript {
       await this.ApiLeaveGame(playerInfo.active_zone_game);
     }
 
-    playerInfo = null;
+    if (this.clan && !this.hasJoinedClan && playerInfo.clan_info && playerInfo.clan_info.accountid !== this.clan) {
+      logger(this.name, `   Attempting to join groupId: ${chalk.yellow(this.clan)}`);
 
-    while (!playerInfo) {
-      playerInfo = await this.ApiGetPlayerInfo();
+      await this.ApiRepresentClan(this.clan);
+
+      let clanCheckInfo = null;
+
+      while (!clanCheckInfo) {
+        clanCheckInfo = await this.ApiGetPlayerInfo();
+      }
+
+      if (clanCheckInfo.clan_info) {
+        logger(this.name, `   ${chalk.bgCyan(`Joined group: ${clanCheckInfo.clan_info.name}`)}`);
+        logger(
+          this.name,
+          `   ${chalk.yellow("If the name above isn't expected, check if you're actually a member of that group")}`,
+        );
+      }
+
+      this.hasJoinedClan = true;
     }
 
     if (!playerInfo.active_planet) {
@@ -715,7 +732,7 @@ class SalienScript {
         debug(e);
       }
 
-      logger(this.name, `   ${chalk.bgMagenta(`Script will restart in ${this.defaultDelaySec} seconds...\n\n`)}`);
+      logger(this.name, `   ${chalk.bgMagenta(`Script will restart in ${this.defaultDelaySec} seconds...`)}\n\n`);
 
       await delay(this.defaultDelayMs);
 
