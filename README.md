@@ -41,7 +41,7 @@
 
 1. Close/cancel any running script windows
 2. Open PowerShell on Windows.
-3. Run `npm update -g salien-script-js`
+3. Run `npm i -g salien-script-js`
 4. Re-run your scripts using the same command
 
 Easy right?
