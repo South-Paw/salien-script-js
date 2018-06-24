@@ -84,6 +84,14 @@ const salien = new SalienScript(config);
 salien.init();
 ```
 
+## Advanced: Deploying to heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+1. Click the button above.
+2. Set SALIEN_CONFIG ("token1:group1:name1;token2:group2:name2...").
+3. All done. For now, there is no way to update script easily without re-creating heroku app or manually pulling upstream changes into heroku repo.
+
 ## Development
 
 Want to help out? Awesome! 👍
