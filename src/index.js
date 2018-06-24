@@ -597,7 +597,7 @@ class SalienScript {
     const { hardZones, mediumZones, capture_progress: captureProgress, planetPlayers } = zone;
 
     if (!hardZones) {
-      if (!mediumZones && new Date().getTime() - this.startTime > this.waitTime) {
+      if (!mediumZones && new Date().getTime() - this.startTime > this.waitTime * 1000) {
         throw new SalienScriptRestart('!! No hard or medium zones on this planet');
       }
 
