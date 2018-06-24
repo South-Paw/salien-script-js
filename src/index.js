@@ -99,11 +99,7 @@ const updateCheck = async (name, pauseLog) => {
   }
 
   if (hasUpdate) {
-    logger(
-      this.name,
-      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
-      chalk.magenta(`The latest version is ${hasUpdate.latest}. Please update.`),
-    );
+    logger(name, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update.`);
   }
 
   if (pauseLog) {
