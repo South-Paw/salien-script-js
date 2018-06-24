@@ -33,7 +33,7 @@
     "cli.js"
   ],
   "bin": {
-    "salien-script-js": "cli.js"
+    "salien-script-js": "./cli.js"
   },
   "main": "src/index.js",
   "repository": {
