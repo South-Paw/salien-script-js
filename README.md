@@ -15,6 +15,7 @@
 ## 🌈 Features
 
 * Easy to install, run and update 🎉
+* Update checker and log notifications ✉️
 * Same logic as the [PHP version](https://github.com/SteamDatabase/SalienCheat) (we almost have parity) 👽
 * Pick your own steam group 👌
 * Works well with multiple tokens/scripts 👥
