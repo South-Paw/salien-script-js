@@ -43,6 +43,8 @@ const logger = (name, ...messages) => {
 // eslint-disable-next-line no-console
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
 
+const getPercentage = number => Number(number * 100).toFixed(2);
+
 const getDifficultyName = zone => {
   const boss = zone.type === 4 ? 'BOSS - ' : '';
 
@@ -498,9 +500,7 @@ class SalienScript {
 
         this.knownPlanetIds.push(planet.id);
 
-        const capturedPercent = Number(planet.state.capture_progress * 100)
-          .toFixed(2)
-          .toString();
+        const capturedPercent = getPercentage(planet.state.capture_progress).toString();
 
         const planetName = formatPlanetName(planet.state.name);
 
@@ -633,9 +633,7 @@ class SalienScript {
 
     const zoneInfo = zone.zone_info;
 
-    const capturedPercent = Number(planetCaptured * 100)
-      .toFixed(2)
-      .toString();
+    const capturedPercent = getPercentage(planetCaptured).toString();
 
     let planetLogMsg = `>> Planet ${chalk.green(this.currentPlanetId)} - Captured: ${chalk.yellow(capturedPercent)}%`;
     planetLogMsg += ` - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)}`;
@@ -643,11 +641,7 @@ class SalienScript {
 
     logger(this.name, planetLogMsg);
 
-    const capturedProgress = !zoneInfo.capture_progress
-      ? 0
-      : Number(zoneInfo.capture_progress * 100)
-          .toFixed(2)
-          .toString();
+    const capturedProgress = !zoneInfo.capture_progress ? 0 : getPercentage(zoneInfo.capture_progress).toString();
 
     let zoneLogMsg = `>> Zone ${chalk.green(zoneInfo.zone_position)} - Captured: ${chalk.yellow(capturedProgress)}%`;
     zoneLogMsg += ` - Difficulty: ${chalk.yellow(getDifficultyName(zoneInfo))}`;
@@ -666,7 +660,7 @@ class SalienScript {
 
     if (report.new_score) {
       const earnedXp = report.new_score - report.old_score;
-      const nextLevelPercent = ((report.new_score / report.next_level_score) * 100).toFixed(2);
+      const nextLevelPercent = getPercentage(report.new_score / report.next_level_score);
 
       let currentLevelMsg = `>> XP Earned: ${chalk.green(earnedXp.toLocaleString())}`;
       currentLevelMsg += ` (${chalk.yellow(report.old_score.toLocaleString())} XP`;
