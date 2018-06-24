@@ -34,7 +34,7 @@ const cli = meow(
 );
 
 if (cli.flags.token) {
-  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.clan, name: cli.flags.name });
+  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.group, name: cli.flags.name });
 
   salien.init();
 }
