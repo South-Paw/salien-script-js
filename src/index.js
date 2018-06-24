@@ -693,7 +693,7 @@ class SalienScript {
 
     await delay(this.waitTime * 1000);
 
-    const report = await this.ApiReportScore(getScoreForZone(zone));
+    const report = await this.ApiReportScore(getScoreForZone(zoneInfo));
 
     if (report.new_score) {
       const earnedXp = report.new_score - report.old_score;
