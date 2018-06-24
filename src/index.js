@@ -96,7 +96,19 @@ const updateCheck = async name => {
   }
 
   if (await hasUpdate) {
-    logger(name, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update!`);
+    logger(
+      name,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      `The latest version is ${chalk.bgCyan(hasUpdate.latest)}. Please update!`,
+    );
+    logger(
+      name,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      `To update, stop this script and run: ${chalk.bgCyan('npm i -g salien-script-js')}`,
+    );
+
+    // eslint-disable-next-line
+    console.log('');
   }
 };
 
@@ -120,7 +132,7 @@ class SalienScript {
     this.clan = clan;
     this.name = name;
 
-    this.maxRetries = 2;
+    this.maxRetries = 3;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
 
