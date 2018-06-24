@@ -516,39 +516,30 @@ class SalienScript {
       }
     }
 
-    if (!this.currentPlanetId) {
-      // TODO allow people to select what zone to focus
-      //  * either by hardest or eaiest
-      //  * by what steam appIds are on each planet
+    // FIXME this logic might be able to be cleaned up
+    const priority = ['hardZones', 'mediumZones', 'easyZones'];
 
+    if (!this.currentPlanetId) {
       this.knownPlanetIds.sort((a, b) => {
         const planetA = this.knownPlanets[a];
         const planetB = this.knownPlanets[b];
 
-        if (planetB.hardZones === planetA.hardZones) {
-          if (planetB.mediumZones === planetA.mediumZones) {
-            // If the hard and medium zones are equal, sort by most capture progress
-            return planetB.state.capture_progress - planetA.state.capture_progress;
-          }
+        for (let i = 0; i < priority.length; i += 1) {
+          const key = priority[i];
 
-          // If the hard zones are equal, sort by least medium zones
-          return planetA.mediumZones - planetB.mediumZones;
+          if (planetA[key] !== planetB[key]) {
+            return planetA[key] - planetB[key];
+          }
         }
 
-        // Sort planets by least amount of hard zones
-        return planetA.hard_zones - planetB.hard_zones;
+        return Number(planetA.id) - Number(planetB.id);
       });
 
-      // FIXME this logic might be able to be cleaned up
-      const priorities = ['hardZones', 'mediumZones'];
-
-      // Loop twice - first loop tries to find planet with hard zones, second loop - medium zones
-      for (let i = 0; i < priorities.length; i += 1) {
-        // eslint-disable-next-line no-loop-func
+      for (let i = 0; i < priority.length; i += 1) {
         this.knownPlanetIds.forEach(planetId => {
           const planet = this.knownPlanets[planetId];
 
-          if (this.skippedPlanets.includes(planetId) || !planet[priorities[i]]) {
+          if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
             return;
           }
 
