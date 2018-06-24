@@ -86,6 +86,30 @@ const getScoreForZone = zone => {
   return score * 120;
 };
 
+const updateCheck = async (name, pauseLog) => {
+  let hasUpdate = null;
+
+  try {
+    hasUpdate = await checkForUpdate(pkg);
+    this.isUpdateChecked = true;
+  } catch (err) {
+    logger(name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
+  }
+
+  if (hasUpdate) {
+    logger(
+      this.name,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      chalk.magenta(`The latest version is ${hasUpdate.latest}. Please update.`),
+    );
+  }
+
+  if (pauseLog) {
+    // pause for 3 seconds after update check
+    await delay(3000);
+  }
+};
+
 class SalienScriptException {
   constructor(message) {
     this.name = 'SalienScriptException';
@@ -591,6 +615,8 @@ class SalienScript {
   async gameLoop() {
     console.log(''); // eslint-disable-line no-console
 
+    await updateCheck(this.name);
+
     // Scan planets every 10 minutes
     if (new Date().getTime() - this.startTime > 600000) {
       throw new SalienScriptRestart('!! Re-scanning for new planets');
@@ -718,34 +744,6 @@ class SalienScript {
     this.knownPlanetIds = [];
     this.knownPlanets = {};
     this.skippedPlanets = [];
-
-    if (!this.isUpdateChecked) {
-      let hasUpdate = null;
-
-      try {
-        hasUpdate = await checkForUpdate(pkg);
-        this.isUpdateChecked = true;
-      } catch (err) {
-        logger(this.name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
-      }
-
-      if (hasUpdate) {
-        logger(
-          this.name,
-          `   ${chalk.bgMagenta(' UpdateCheck ')}`,
-          chalk.magenta(`The latest version is ${hasUpdate.latest}. Please update.`),
-        );
-      } else {
-        logger(
-          this.name,
-          `   ${chalk.bgMagenta(' UpdateCheck ')}`,
-          chalk.magenta("You're running the latest version!"),
-        );
-      }
-
-      // pause for 3 seconds after update check
-      await delay(3000);
-    }
 
     try {
       logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}`);
