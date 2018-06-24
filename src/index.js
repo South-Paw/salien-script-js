@@ -327,7 +327,7 @@ class SalienScript {
     if (leaveCurrentPlanet > 0 && leaveCurrentPlanet !== activePlanet) {
       logger(
         this.name,
-        `Leaving planet ${chalk.yellow(activePlanet)}, because we want to be on ${chalk.yellow(leaveCurrentPlanet)}`,
+        `>> Leaving planet ${chalk.yellow(activePlanet)}, because we want to be on ${chalk.yellow(leaveCurrentPlanet)}`,
       );
 
       await this.ApiLeaveGame(activePlanet);
