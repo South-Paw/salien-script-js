@@ -24,7 +24,7 @@ const cliOptions = {
 const cli = meow(
   `
     Usage
-      salient-script-js [options]
+      salien-script-js [options]
 
     Options
       --token, -t     Your game token.
