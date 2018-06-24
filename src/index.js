@@ -88,23 +88,29 @@ const formatPlanetName = name =>
     .split('_')
     .join(' ');
 
-const updateCheck = async (name, pauseLog) => {
+const updateCheck = async name => {
   let hasUpdate = null;
 
   try {
-    hasUpdate = await checkForUpdate(pkg);
-    this.isUpdateChecked = true;
+    hasUpdate = await checkForUpdate(pkg, { interval: 120000 });
   } catch (err) {
     logger(name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
   }
 
-  if (hasUpdate) {
-    logger(name, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update.`);
-  }
+  if (await hasUpdate) {
+    logger(
+      name,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      `The latest version is ${chalk.bgCyan(hasUpdate.latest)}. Please update!`,
+    );
+    logger(
+      name,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      `To update, stop this script and run: ${chalk.bgCyan('npm i -g salien-script-js')}`,
+    );
 
-  if (pauseLog) {
-    // pause for 3 seconds after update check
-    await delay(3000);
+    // eslint-disable-next-line
+    console.log('');
   }
 };
 
@@ -128,7 +134,7 @@ class SalienScript {
     this.clan = clan;
     this.name = name;
 
-    this.maxRetries = 2;
+    this.maxRetries = 3;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
 
@@ -686,7 +692,7 @@ class SalienScript {
 
     await delay(this.waitTime * 1000);
 
-    const report = await this.ApiReportScore(getScoreForZone(zone));
+    const report = await this.ApiReportScore(getScoreForZone(zoneInfo));
 
     if (report.new_score) {
       const earnedXp = report.new_score - report.old_score;
@@ -702,9 +708,9 @@ class SalienScript {
       const remainingXp = report.next_level_score - report.new_score;
 
       const timeRemaining =
-        ((report.next_level_score - report.new_score) / getScoreForZone(zone)) * (this.waitTime / 60);
+        ((report.next_level_score - report.new_score) / getScoreForZone(zoneInfo)) * (this.waitTime / 60);
       const hoursRemaining = Math.floor(timeRemaining / 60);
-      const minutesRemaining = timeRemaining % 60;
+      const minutesRemaining = Math.round(timeRemaining % 60);
       const levelEta = `${hoursRemaining}h ${minutesRemaining}m`;
 
       let nextLevelMsg = `>> Next Level: ${chalk.yellow(report.next_level_score.toLocaleString())} XP`;
