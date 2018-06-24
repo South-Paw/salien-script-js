@@ -555,7 +555,10 @@ class SalienScript {
       });
     } catch (e) {
       if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
-        logger(this.name, chalk.green('>> This planet has a boss zone, selecting this planet'));
+        logger(
+          this.name,
+          chalk.green(`>> Planet ${chalk.yellow(this.currentPlanetId)} has a boss zone, selecting this planet`),
+        );
       } else {
         debug(e);
         throw new SalienScriptException(e.message);
