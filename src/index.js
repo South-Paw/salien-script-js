@@ -703,9 +703,9 @@ class SalienScript {
       const remainingXp = report.next_level_score - report.new_score;
 
       const timeRemaining =
-        ((report.next_level_score - report.new_score) / getScoreForZone(zone)) * (this.waitTime / 60);
+        ((report.next_level_score - report.new_score) / getScoreForZone(zoneInfo)) * (this.waitTime / 60);
       const hoursRemaining = Math.floor(timeRemaining / 60);
-      const minutesRemaining = timeRemaining % 60;
+      const minutesRemaining = Math.round(timeRemaining % 60);
       const levelEta = `${hoursRemaining}h ${minutesRemaining}m`;
 
       let nextLevelMsg = `>> Next Level: ${chalk.yellow(report.next_level_score.toLocaleString())} XP`;
