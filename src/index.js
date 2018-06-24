@@ -145,8 +145,8 @@ class SalienScript {
 
     this.currentPlanetId = null;
     this.steamPlanetId = null;
+    this.knownPlanets = new Map();
     this.knownPlanetIds = [];
-    this.knownPlanets = {};
     this.skippedPlanets = [];
   }
 
@@ -517,16 +517,16 @@ class SalienScript {
           }
         });
 
-        this.knownPlanets[planet.id] = {
+        this.knownPlanetIds.push(planet.id);
+
+        this.knownPlanets.set(planet.id, {
           hardZones,
           mediumZones,
           easyZones,
           unknownZones,
           hasBossZone,
           ...planet,
-        };
-
-        this.knownPlanetIds.push(planet.id);
+        });
 
         const capturedPercent = getPercentage(planet.state.capture_progress).toString();
 
@@ -543,8 +543,12 @@ class SalienScript {
         if (unknownZones) {
           logger(this.name, `>> Unknown zones found: ${chalk.yellow(unknownZones)}`);
         }
+      });
 
-        if (hasBossZone) {
+      this.knownPlanetIds.forEach(id => {
+        const planet = this.knownPlanets.get(id);
+
+        if (planet.hasBossZone) {
           this.currentPlanetId = planet.id;
           throw new SalienScriptException('Boss zone found!');
         }
@@ -562,9 +566,9 @@ class SalienScript {
     const priority = ['hardZones', 'mediumZones', 'easyZones'];
 
     if (!this.currentPlanetId) {
-      this.knownPlanetIds.sort((a, b) => {
-        const planetA = this.knownPlanets[a];
-        const planetB = this.knownPlanets[b];
+      const sortedPlanetIds = this.knownPlanetIds.sort((a, b) => {
+        const planetA = this.knownPlanets.get(a);
+        const planetB = this.knownPlanets.get(b);
 
         for (let i = 0; i < priority.length; i += 1) {
           const key = priority[i];
@@ -578,8 +582,8 @@ class SalienScript {
       });
 
       for (let i = 0; i < priority.length; i += 1) {
-        this.knownPlanetIds.forEach(planetId => {
-          const planet = this.knownPlanets[planetId];
+        sortedPlanetIds.forEach(planetId => {
+          const planet = this.knownPlanets.get(planetId);
 
           if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
             return;
@@ -734,7 +738,7 @@ class SalienScript {
     // Reset all variables to default values every time init() is called
     this.currentPlanetId = null;
     this.knownPlanetIds = [];
-    this.knownPlanets = {};
+    this.knownPlanets = new Map();
     this.skippedPlanets = [];
 
     try {
