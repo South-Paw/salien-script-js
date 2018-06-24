@@ -26,8 +26,9 @@ const chalk = require('chalk');
 const dateFormat = require('dateformat');
 const delay = require('delay');
 const fetch = require('fetch-retry');
+const checkForUpdate = require('update-check');
 
-const { version: pkgVersion } = require('../package.json');
+const pkg = require('../package.json');
 
 const logger = (name, ...messages) => {
   let message = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
@@ -87,6 +88,30 @@ const formatPlanetName = name =>
     .split('_')
     .join(' ');
 
+const updateCheck = async (name, pauseLog) => {
+  let hasUpdate = null;
+
+  try {
+    hasUpdate = await checkForUpdate(pkg);
+    this.isUpdateChecked = true;
+  } catch (err) {
+    logger(name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
+  }
+
+  if (hasUpdate) {
+    logger(
+      this.name,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      chalk.magenta(`The latest version is ${hasUpdate.latest}. Please update.`),
+    );
+  }
+
+  if (pauseLog) {
+    // pause for 3 seconds after update check
+    await delay(3000);
+  }
+};
+
 class SalienScriptException {
   constructor(message) {
     this.name = 'SalienScriptException';
@@ -114,6 +139,7 @@ class SalienScript {
     this.startTime = null;
     this.waitTime = 110;
     this.hasJoinedClan = false;
+    this.isUpdateChecked = false;
 
     this.currentPlanetId = null;
     this.steamPlanetId = null;
@@ -583,6 +609,8 @@ class SalienScript {
   async gameLoop() {
     console.log(''); // eslint-disable-line no-console
 
+    await updateCheck(this.name);
+
     // Scan planets every 10 minutes
     if (new Date().getTime() - this.startTime > 600000) {
       throw new SalienScriptRestart('!! Re-scanning for new planets');
@@ -706,7 +734,7 @@ class SalienScript {
     this.skippedPlanets = [];
 
     try {
-      logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkgVersion} `)}`);
+      logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}`);
       logger(
         this.name,
         `   ${chalk.bgCyan(` If you appreciate the script, please remember to leave a ⭐ star ⭐ on the project! `)}`,
