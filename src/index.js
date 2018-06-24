@@ -682,7 +682,7 @@ class SalienScript {
     let leftGame;
 
     while (!leftGame) {
-      leftGame = this.leaveCurrentGame();
+      leftGame = await this.leaveCurrentGame(this.currentPlanetId);
     }
 
     if (leftGame !== this.currentPlanetId) {
