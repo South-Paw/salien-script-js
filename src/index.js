@@ -79,6 +79,12 @@ const getScoreForZone = zone => {
   return score * 120;
 };
 
+const formatPlanetName = name =>
+  name
+    .replace('#TerritoryControl_Planet', '')
+    .split('_')
+    .join(' ');
+
 class SalienScriptException {
   constructor(message) {
     this.name = 'SalienScriptException';
@@ -496,10 +502,7 @@ class SalienScript {
           .toFixed(2)
           .toString();
 
-        const planetName = planet.state.name
-          .replace('#TerritoryControl_Planet', '')
-          .split('_')
-          .join(' ');
+        const planetName = formatPlanetName(planet.state.name);
 
         let logMsg = `>> Planet: ${chalk.green(planet.id)}`;
         logMsg += ` - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)}`;
@@ -550,10 +553,7 @@ class SalienScript {
           }
 
           if (!planet.state.captured && !this.currentPlanetId) {
-            const planetName = planet.state.name
-              .replace('#TerritoryControl_Planet', '')
-              .split('_')
-              .join(' ');
+            const planetName = formatPlanetName(planet.state.name);
 
             logger(this.name, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
 
