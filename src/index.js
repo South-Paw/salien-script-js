@@ -547,6 +547,7 @@ class SalienScript {
       if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
         logger(this.name, chalk.green('>> This planet has a boss zone, selecting this planet'));
       } else {
+        debug(e);
         throw new SalienScriptException(e.message);
       }
     }
