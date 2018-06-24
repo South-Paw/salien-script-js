@@ -649,10 +649,7 @@ class SalienScript {
       }
     }
 
-    const planetName = zone.planetName
-      .replace('#TerritoryControl_', '')
-      .split('_')
-      .join(' ');
+    const planetName = formatPlanetName(zone.planetName);
 
     const position = zone.zone_position;
 
