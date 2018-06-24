@@ -50,7 +50,8 @@
     "dateformat": "^3.0.3",
     "delay": "^3.0.0",
     "fetch-retry": "^1.2.1",
-    "meow": "^5.0.0"
+    "meow": "^5.0.0",
+    "update-check": "^1.5.2"
   },
   "devDependencies": {
     "eslint": "^5.0.0",
