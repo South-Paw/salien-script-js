@@ -108,6 +108,7 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 
 1. Click the button above.
 2. Set SALIEN_CONFIG ("token1:group1:name1;token2:group2:name2...").
+![Heroku-Config](https://i.imgur.com/07KcyVC.png)
 3. All done. For now, there is no way to update script easily without re-creating heroku app or manually pulling upstream changes into heroku repo.
 
 ---
