@@ -594,7 +594,7 @@ class SalienScript {
       throw new SalienScriptRestart('!! There are no zones to join in this planet');
     }
 
-    const { hardZones, mediumZones, capture_progress: captureProgress, planetPlayers } = zone;
+    const { hardZones, mediumZones, planetCaptured, planetPlayers } = zone;
 
     if (!hardZones) {
       if (!mediumZones && new Date().getTime() - this.startTime > this.waitTime * 1000) {
@@ -627,7 +627,7 @@ class SalienScript {
 
     const zoneInfo = zone.zone_info;
 
-    const capturedPercent = Number(captureProgress * 100)
+    const capturedPercent = Number(planetCaptured * 100)
       .toFixed(2)
       .toString();
 
@@ -639,7 +639,7 @@ class SalienScript {
 
     const capturedProgress = !zoneInfo.capture_progress
       ? 0
-      : Number(zoneInfo.capture_progress)
+      : Number(zoneInfo.capture_progress * 100)
           .toFixed(2)
           .toString();
 
