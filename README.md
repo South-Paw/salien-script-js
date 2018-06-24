@@ -84,6 +84,12 @@ const salien = new SalienScript(config);
 salien.init();
 ```
 
+## Advanced: Deploying to heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+A manual should be here
+
 ## Development
 
 Want to help out? Awesome! 👍
