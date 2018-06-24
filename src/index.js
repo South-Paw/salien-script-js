@@ -280,7 +280,7 @@ class SalienScript {
       }
 
       if (clanCheckInfo.clan_info) {
-        logger(this.name, `   ${chalk.bgCyan(`Joined group: ${clanCheckInfo.clan_info.name}`)}`);
+        logger(this.name, `   ${chalk.bgCyan(` Joined group: ${clanCheckInfo.clan_info.name} `)}`);
         logger(
           this.name,
           `   ${chalk.yellow("If the name above isn't expected, check if you're actually a member of that group")}`,
@@ -600,7 +600,7 @@ class SalienScript {
       throw new SalienScriptRestart('!! There are no zones to join in this planet');
     }
 
-    const { hardZones, mediumZones, planetCaptured, planetPlayers } = zone;
+    const { hardZones, mediumZones, easyZones, planetCaptured, planetPlayers } = zone;
 
     if (!hardZones) {
       if (!mediumZones && new Date().getTime() - this.startTime > this.waitTime * 1000) {
@@ -637,6 +637,7 @@ class SalienScript {
 
     let planetLogMsg = `>> Planet ${chalk.green(this.currentPlanetId)} - Captured: ${chalk.yellow(capturedPercent)}%`;
     planetLogMsg += ` - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)}`;
+    planetLogMsg += ` - Easy: ${chalk.yellow(easyZones)}`;
     planetLogMsg += ` - Players: ${chalk.yellow(planetPlayers.toLocaleString())} (${chalk.green(planetName)})`;
 
     logger(this.name, planetLogMsg);
@@ -652,7 +653,7 @@ class SalienScript {
       logger(this.name, `-- Top Clans:${zoneInfo.top_clans.map(({ name }) => ` ${name}`)}`);
     }
 
-    logger(this.name, `   ${chalk.bgMagenta(`Waiting ${this.waitTime} seconds for round to finish...`)}`);
+    logger(this.name, `   ${chalk.bgMagenta(` Waiting ${this.waitTime} seconds for round to finish... `)}`);
 
     await delay(this.waitTime * 1000);
 
@@ -664,7 +665,7 @@ class SalienScript {
 
       let currentLevelMsg = `>> XP Earned: ${chalk.green(earnedXp.toLocaleString())}`;
       currentLevelMsg += ` (${chalk.yellow(report.old_score.toLocaleString())} XP`;
-      currentLevelMsg += `=> ${chalk.green(report.new_score.toLocaleString())} XP)`;
+      currentLevelMsg += ` => ${chalk.green(report.new_score.toLocaleString())} XP)`;
       currentLevelMsg += ` - Current Level: ${chalk.green(report.new_level)} (${nextLevelPercent}% to next)`;
 
       logger(this.name, currentLevelMsg);
@@ -678,7 +679,7 @@ class SalienScript {
       const levelEta = `${hoursRemaining}h ${minutesRemaining}m`;
 
       let nextLevelMsg = `>> Next Level: ${chalk.yellow(report.next_level_score.toLocaleString())} XP`;
-      nextLevelMsg += `- Remaining: ${chalk.yellow(remainingXp.toLocaleString())} XP - ETA: ${chalk.green(levelEta)}`;
+      nextLevelMsg += ` - Remaining: ${chalk.yellow(remainingXp.toLocaleString())} XP - ETA: ${chalk.green(levelEta)}`;
 
       logger(this.name, nextLevelMsg);
     }
@@ -706,6 +707,10 @@ class SalienScript {
 
     try {
       logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkgVersion} `)}`);
+      logger(
+        this.name,
+        `   ${chalk.bgCyan(` If you appreciate the script, please remember to leave a ⭐ star ⭐ on the project! `)}`,
+      );
 
       await this.setupGame();
 
@@ -720,7 +725,7 @@ class SalienScript {
         debug(e);
       }
 
-      logger(this.name, `   ${chalk.bgMagenta(`Script will restart in ${this.defaultDelaySec} seconds...`)}\n\n`);
+      logger(this.name, `   ${chalk.bgMagenta(` Script will restart in ${this.defaultDelaySec} seconds... `)}\n\n`);
 
       await delay(this.defaultDelayMs);
 
