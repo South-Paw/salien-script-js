@@ -96,7 +96,7 @@ salien.init();
 2. Set SALIEN_CONFIG ("token1:group1:name1;token2:group2:name2...").
 3. All done. For now, there is no way to update script easily without re-creating heroku app or manually pulling upstream changes into heroku repo.
 
-## Advanced: Running as a Docker container
+## Advanced: 🐳 Running as a Docker container
 
 The provided Dockerfile allows you to build this repository as a Docker container. To do that, clone the following repo and run the following commands.
 
