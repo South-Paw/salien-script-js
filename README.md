@@ -1,6 +1,6 @@
 # salien-script-js
 
-👽 Scripting the Steam Salien Sale minigame, the proper way.
+👽 An easy to install, run and update Node.js script for the Steam salien mini-game. 
 
 > A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw) with additional features!
 

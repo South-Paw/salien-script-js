@@ -1,7 +1,7 @@
 {
   "name": "salien-script-js",
   "version": "0.0.11",
-  "description": "Scripting the Steam Salien Sale minigame, the proper way.",
+  "description": "An easy to install, run and update Node.js script for the Steam salien mini-game.",
   "keywords": [
     "salien",
     "steam",
