@@ -1,6 +1,6 @@
 {
   "name": "salien-script-js",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Scripting the Steam Salien Sale minigame, the proper way.",
   "keywords": [
     "salien",
@@ -33,7 +33,7 @@
     "cli.js"
   ],
   "bin": {
-    "salien-script-js": "cli.js"
+    "salien-script-js": "./cli.js"
   },
   "main": "src/index.js",
   "repository": {

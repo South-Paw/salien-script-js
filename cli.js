@@ -1,5 +1,6 @@
-const meow = require('meow');
+#!/usr/bin/env node
 
+const meow = require('meow');
 const SalienScript = require('./src/index.js');
 
 /** @type {meow.Options} */
@@ -13,20 +14,28 @@ const cliOptions = {
       type: 'string',
       alias: 'g',
     },
+    name: {
+      type: 'string',
+      alias: 'n',
+    },
   },
 };
 
-const cli = meow(`
+const cli = meow(
+  `
     Usage
-      $ salient-script-js [options]
+      salient-script-js [options]
 
     Options
       --token, -t     Your game token.
-      --group, -g      The ID of a steam group you'd like to represent. (optional)
-`, cliOptions);
+      --group, -g     The ID of a steam group you'd like to represent. (optional)
+      --name, -n      Name this instance of the script. (optional)
+`,
+  cliOptions,
+);
 
 if (cli.flags.token) {
-  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.clan });
+  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.group, name: cli.flags.name });
 
   salien.init();
 }
