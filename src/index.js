@@ -26,8 +26,9 @@ const chalk = require('chalk');
 const dateFormat = require('dateformat');
 const delay = require('delay');
 const fetch = require('fetch-retry');
+const checkForUpdate = require('update-check');
 
-const { version: pkgVersion } = require('../package.json');
+const pkg = require('../package.json');
 
 const logger = (name, ...messages) => {
   let message = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
@@ -112,6 +113,7 @@ class SalienScript {
     this.startTime = null;
     this.waitTime = 110;
     this.hasJoinedClan = false;
+    this.isUpdateChecked = false;
 
     this.currentPlanetId = null;
     this.steamPlanetId = null;
@@ -717,8 +719,36 @@ class SalienScript {
     this.knownPlanets = {};
     this.skippedPlanets = [];
 
+    if (!this.isUpdateChecked) {
+      let hasUpdate = null;
+
+      try {
+        hasUpdate = await checkForUpdate(pkg);
+        this.isUpdateChecked = true;
+      } catch (err) {
+        logger(this.name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
+      }
+
+      if (hasUpdate) {
+        logger(
+          this.name,
+          `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+          chalk.magenta(`The latest version is ${hasUpdate.latest}. Please update.`),
+        );
+      } else {
+        logger(
+          this.name,
+          `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+          chalk.magenta("You're running the latest version!"),
+        );
+      }
+    }
+
+    // pause for 3 seconds after update check
+    await delay(3000);
+
     try {
-      logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkgVersion} `)}`);
+      logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}`);
       logger(
         this.name,
         `   ${chalk.bgCyan(` If you appreciate the script, please remember to leave a ⭐ star ⭐ on the project! `)}`,
