@@ -431,6 +431,8 @@ class SalienScript {
       throw new SalienScriptException("Didn't find any planets.");
     }
 
+    logger(this.name, '   Getting first available planet...');
+
     try {
       // Patch the apiGetPlanets response with zones from apiGetPlanet
       const mappedPlanets = await Promise.all(
@@ -451,7 +453,7 @@ class SalienScript {
 
         let hasBossZone = false;
 
-        // Filter out captured zones
+        // Filter out captured zones + determine zone types
         planet.zones.forEach(zone => {
           if ((zone.capture_progress && zone.capture_progress > 0.97) || zone.captured) {
             return;
@@ -495,7 +497,7 @@ class SalienScript {
           .toString();
 
         const planetName = planet.state.name
-          .replace('#TerritoryControl_', '')
+          .replace('#TerritoryControl_Planet', '')
           .split('_')
           .join(' ');
 
@@ -512,8 +514,7 @@ class SalienScript {
         }
 
         if (hasBossZone) {
-          // eslint-disable-next-line no-param-reassign
-          logger(chalk.green('>> This planet has a boss zone, selecting this planet'));
+          logger(this.name, chalk.green('>> This planet has a boss zone, selecting this planet'));
           this.currentPlanetId = planet.id;
         }
       });
@@ -550,7 +551,7 @@ class SalienScript {
 
           if (!planet.state.captured && !this.currentPlanetId) {
             const planetName = planet.state.name
-              .replace('#TerritoryControl_', '')
+              .replace('#TerritoryControl_Planet', '')
               .split('_')
               .join(' ');
 
