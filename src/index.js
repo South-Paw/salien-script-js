@@ -86,23 +86,17 @@ const getScoreForZone = zone => {
   return score * 120;
 };
 
-const updateCheck = async (name, pauseLog) => {
+const updateCheck = async name => {
   let hasUpdate = null;
 
   try {
-    hasUpdate = await checkForUpdate(pkg);
-    this.isUpdateChecked = true;
+    hasUpdate = await checkForUpdate(pkg, { interval: 120000 });
   } catch (err) {
     logger(name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
   }
 
-  if (hasUpdate) {
-    logger(name, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update.`);
-  }
-
-  if (pauseLog) {
-    // pause for 3 seconds after update check
-    await delay(3000);
+  if (await hasUpdate) {
+    logger(name, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update!`);
   }
 };
 
