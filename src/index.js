@@ -611,12 +611,10 @@ class SalienScript {
             }
           });
         }
-      } else {
-        if (!selectedPlanet.state.captured && !this.currentPlanetId) {
-          const planetName = formatPlanetName(selectedPlanet.state.name);
-          logger(this.name, `>> Selected planet ${chalk.green(this.planet)} (${chalk.green(planetName)})`);
-          this.currentPlanetId = this.planet;
-        }
+      } else if (!selectedPlanet.state.captured && !this.currentPlanetId) {
+        const planetName = formatPlanetName(selectedPlanet.state.name);
+        logger(this.name, `>> Selected planet ${chalk.green(this.planet)} (${chalk.green(planetName)})`);
+        this.currentPlanetId = this.planet;
       }
 
       if (!this.currentPlanetId) {
