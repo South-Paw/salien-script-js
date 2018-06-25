@@ -14,6 +14,10 @@ const cliOptions = {
       type: 'string',
       alias: 'g',
     },
+    planet: {
+      type: 'string',
+      alias: 'p'
+    },
     name: {
       type: 'string',
       alias: 'n',
@@ -29,13 +33,14 @@ const cli = meow(
     Options
       --token, -t     Your game token.
       --group, -g     The ID of a steam group you'd like to represent. (optional)
+      --planet, -p    Select planet to fight on. (optional)
       --name, -n      Name this instance of the script. (optional)
 `,
   cliOptions,
 );
 
 if (cli.flags.token) {
-  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.group, name: cli.flags.name });
+  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.group, planet: cli.flags.planet, name: cli.flags.name });
 
   salien.init();
 }
