@@ -131,9 +131,10 @@ class SalienScriptRestart {
 }
 
 class SalienScript {
-  constructor({ token, clan, name = null }) {
+  constructor({ token, clan, planet = null, name = null }) {
     this.token = token;
     this.clan = clan;
+    this.planet = planet;
     this.name = name;
 
     this.maxRetries = 3;
@@ -586,22 +587,36 @@ class SalienScript {
         return Number(planetA.id) - Number(planetB.id);
       });
 
-      for (let i = 0; i < priority.length; i += 1) {
-        sortedPlanetIds.forEach(planetId => {
-          const planet = this.knownPlanets.get(planetId);
+      const selectedPlanet = this.knownPlanets.get(this.planet);
 
-          if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
-            return;
-          }
+      if (!selectedPlanet || this.skippedPlanets.includes(this.planet)) {
+        logger(
+          this.name,
+          `>> Selected planet ${chalk.yellow(this.planet)} not available. Slecting next available planet...`,
+        );
+        for (let i = 0; i < priority.length; i += 1) {
+          sortedPlanetIds.forEach(planetId => {
+            const planet = this.knownPlanets.get(planetId);
 
-          if (!planet.state.captured && !this.currentPlanetId) {
-            const planetName = formatPlanetName(planet.state.name);
+            if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
+              return;
+            }
 
-            logger(this.name, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
+            if (!planet.state.captured && !this.currentPlanetId) {
+              const planetName = formatPlanetName(planet.state.name);
 
-            this.currentPlanetId = planetId;
-          }
-        });
+              logger(this.name, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
+
+              this.currentPlanetId = planetId;
+            }
+          });
+        }
+      } else {
+        if (!selectedPlanet.state.captured && !this.currentPlanetId) {
+          const planetName = formatPlanetName(selectedPlanet.state.name);
+          logger(this.name, `>> Selected planet ${chalk.green(this.planet)} (${chalk.green(planetName)})`);
+          this.currentPlanetId = this.planet;
+        }
       }
 
       if (!this.currentPlanetId) {
