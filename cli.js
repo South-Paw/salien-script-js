@@ -16,7 +16,7 @@ const cliOptions = {
     },
     planet: {
       type: 'string',
-      alias: 'p'
+      alias: 'p',
     },
     name: {
       type: 'string',
@@ -40,7 +40,12 @@ const cli = meow(
 );
 
 if (cli.flags.token) {
-  const salien = new SalienScript({ token: cli.flags.token, clan: cli.flags.group, planet: cli.flags.planet, name: cli.flags.name });
+  const salien = new SalienScript({
+    token: cli.flags.token,
+    clan: cli.flags.group,
+    planet: cli.flags.planet,
+    name: cli.flags.name,
+  });
 
   salien.init();
 }
