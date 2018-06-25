@@ -104,12 +104,43 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 
 ## Advanced: ☁️ Deploying to heroku
 
+### Deploying with web-console
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 1. Click the button above.
-2. Set SALIEN_CONFIG ("token1:group1:name1;token2:group2:name2...").
+2. Set SALIEN_CONFIG (`token1:group1:name1;token2:group2:name2...`).
 ![Heroku-Config](https://i.imgur.com/07KcyVC.png)
-3. All done. For now, there is no way to update script easily without re-creating heroku app or manually pulling upstream changes into heroku repo.
+3. That's all!
+
+### Deploying with Heroku CLI
+
+```bash
+$ git clone https://github.com/South-Paw/salien-script-js -o upstream
+$ cd salien-script-js
+$ heroku create [APP_NAME]
+$ heroku config:set "SALIEN_CONFIG=token1:group1:name1;token2:group2:name2..."
+$ git push heroku master
+$ heroku ps:scale web=0 salien=1
+```
+
+### Updating
+
+If you created your app using web-console, you need to clone heroku repo first
+
+```bash
+$ git clone https://git.heroku.com/[APP_NAME].git -o heroku
+$ cd [APP_NAME]
+$ git remote add upstream https://github.com/South-Paw/salien-script-js.git
+```
+
+And then, fetch, merge and push
+
+```bash
+$ git fetch upstream
+$ git merge remotes/upstream/master
+$ git push heroku master
+```
 
 ---
 
