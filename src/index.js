@@ -25,11 +25,8 @@
  */
 
 const chalk = require('chalk');
-const dateFormat = require('dateformat');
 const delay = require('delay');
-const checkForUpdate = require('update-check');
 
-const pkg = require('../package.json');
 const {
   getPlayerInfo,
   getPlanets,
@@ -41,30 +38,8 @@ const {
   reportScore,
 } = require('./api/index');
 const { SalienScriptException, SalienScriptRestart } = require('./exceptions');
-
-// eslint-disable-next-line no-console
-const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
-
-const logger = (name, msg) => {
-  const { message, error } = msg;
-
-  let prefix = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
-
-  if (name) {
-    prefix += ` (${name})`;
-  }
-
-  // maybe do some fancy indentation logic here...?
-
-  // eslint-disable-next-line no-console
-  console.log(prefix, message);
-
-  if (error) {
-    debug(error);
-  }
-};
-
-const getPercentage = number => Number(number * 100).toFixed(2);
+const { debug, logger, getPercentage, updateCheck } = require('./util');
+const pkg = require('../package.json');
 
 const getDifficultyName = zone => {
   const boss = zone.type === 4 ? 'BOSS - ' : '';
@@ -108,31 +83,8 @@ const formatPlanetName = name =>
     .split('_')
     .join(' ');
 
-const updateCheck = async name => {
-  let hasUpdate = null;
-
-  try {
-    hasUpdate = await checkForUpdate(pkg, { interval: 120000 });
-  } catch (err) {
-    logger(name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
-  }
-
-  if (await hasUpdate) {
-    logger(
-      name,
-      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
-      `The latest version is ${chalk.bgCyan(hasUpdate.latest)}. Please update!`,
-    );
-    logger(
-      name,
-      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
-      `To update, stop this script and run: ${chalk.bgCyan('npm i -g salien-script-js')}`,
-    );
-
-    // eslint-disable-next-line
-    console.log('');
-  }
-};
+// TODO: next step is to break all the game logic out from this file and into reusable functions. Things like selecting
+// the first planet, sending a score ... etc can all be abstracted out.
 
 class SalienScript {
   constructor({ token, clan, name = null }) {
@@ -140,14 +92,12 @@ class SalienScript {
     this.clan = clan;
     this.name = name;
 
-    this.maxRetries = 3;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
 
     this.startTime = null;
     this.waitTime = 110;
     this.hasJoinedClan = false;
-    this.isUpdateChecked = false;
 
     this.currentPlanetId = null;
     this.steamPlanetId = null;
@@ -155,6 +105,8 @@ class SalienScript {
     this.knownPlanetIds = [];
     this.skippedPlanets = [];
   }
+
+  // TODO: it'd be nice to remove all of these class async funcs but might be messy with that little logger function...
 
   async ApiGetPlayerInfo() {
     return getPlayerInfo(this.token, msg => logger(this.name, msg));
