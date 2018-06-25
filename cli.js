@@ -43,7 +43,7 @@ if (cli.flags.token) {
   const salien = new SalienScript({
     token: cli.flags.token,
     clan: cli.flags.group,
-    planet: cli.flags.planet,
+    selectedPlanetId: cli.flags.planet,
     name: cli.flags.name,
   });
 
