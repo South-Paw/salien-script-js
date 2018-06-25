@@ -1,11 +1,12 @@
 # salien-script-js
 
-👽 An easy to install, run and update Node.js script for the Steam salien mini-game. 
+👽 A easy to install, run and update Node.js script for the Steam salien mini-game.
 
 > A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw) with additional features!
 
 [![npm](https://img.shields.io/npm/v/salien-script-js.svg)](https://www.npmjs.com/package/salien-script-js)
 [![CI Status](https://img.shields.io/travis/South-Paw/salien-script-js.svg)](https://travis-ci.org/South-Paw/salien-script-js)
+[![Coveralls Status](https://img.shields.io/coveralls/github/South-Paw/salien-script-js.svg)](https://coveralls.io/github/South-Paw/salien-script-js)
 [![Dependencies](https://david-dm.org/South-Paw/salien-script-js.svg)](https://david-dm.org/South-Paw/salien-script-js)
 [![Dev Dependencies](https://david-dm.org/South-Paw/salien-script-js/dev-status.svg)](https://david-dm.org/South-Paw/salien-script-js?type=dev)
 

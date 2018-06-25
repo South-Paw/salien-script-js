@@ -27,24 +27,42 @@
 const chalk = require('chalk');
 const dateFormat = require('dateformat');
 const delay = require('delay');
-const fetch = require('fetch-retry');
 const checkForUpdate = require('update-check');
 
 const pkg = require('../package.json');
-
-const logger = (name, ...messages) => {
-  let message = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
-
-  if (name) {
-    message += ` (${name})`;
-  }
-
-  // eslint-disable-next-line no-console
-  console.log(message, ...messages);
-};
+const {
+  getPlayerInfo,
+  getPlanets,
+  getPlanet,
+  representClan,
+  leaveGame,
+  joinPlanet,
+  joinZone,
+  reportScore,
+} = require('./api/index');
+const { SalienScriptException, SalienScriptRestart } = require('./exceptions');
 
 // eslint-disable-next-line no-console
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
+
+const logger = (name, msg) => {
+  const { message, error } = msg;
+
+  let prefix = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
+
+  if (name) {
+    prefix += ` (${name})`;
+  }
+
+  // maybe do some fancy indentation logic here...?
+
+  // eslint-disable-next-line no-console
+  console.log(prefix, message);
+
+  if (error) {
+    debug(error);
+  }
+};
 
 const getPercentage = number => Number(number * 100).toFixed(2);
 
@@ -116,20 +134,6 @@ const updateCheck = async name => {
   }
 };
 
-class SalienScriptException {
-  constructor(message) {
-    this.name = 'SalienScriptException';
-    this.message = message;
-  }
-}
-
-class SalienScriptRestart {
-  constructor(message) {
-    this.name = 'SalienScriptRestart';
-    this.message = message;
-  }
-}
-
 class SalienScript {
   constructor({ token, clan, name = null }) {
     this.token = token;
@@ -152,139 +156,36 @@ class SalienScript {
     this.skippedPlanets = [];
   }
 
-  async RequestAPI(method, params, maxRetries, additionalOptions = {}) {
-    let url = `https://community.steam-api.com/${method}/v0001`;
-
-    if (params) {
-      url += '/?';
-
-      params.forEach(param => {
-        url += `${param}&`;
-      });
-
-      url = url.substring(0, url.length - 1);
-    }
-
-    const options = {
-      retries: 3,
-      retryDelay: 1000,
-      headers: {
-        Accept: '*/*',
-        Origin: 'https://steamcommunity.com',
-        Referer: 'https://steamcommunity.com/saliengame/play/',
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36',
-      },
-      ...additionalOptions,
-    };
-
-    let request;
-    let response;
-    let retries = 0;
-
-    while (!response && retries < maxRetries) {
-      try {
-        logger(this.name, chalk.blue(`   Sending ${method}...`));
-        request = await fetch(url, options);
-        response = await request.json();
-      } catch (e) {
-        // TODO there is some error handling/messaging we could implement here
-        // see: https://github.com/SteamDatabase/SalienCheat/blob/ac3a28aeb0446ff80cf6a6e1370fd5ef42e75aa2/cheat.php#L533
-
-        logger(this.name, `   ${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`);
-        debug(e);
-
-        retries += 1;
-
-        if (retries < maxRetries) {
-          logger(this.name, chalk.yellow(`   Retrying ${method} in ${this.defaultDelaySec} seconds...`));
-        } else {
-          throw new SalienScriptException(`Failed ${method} after ${retries} retries`);
-        }
-
-        await delay(this.defaultDelayMs);
-      }
-    }
-
-    return response.response;
+  async ApiGetPlayerInfo() {
+    return getPlayerInfo(this.token, msg => logger(this.name, msg));
   }
 
   async ApiGetPlanets() {
-    const response = await this.RequestAPI(
-      'ITerritoryControlMinigameService/GetPlanets',
-      ['active_only=1'],
-      this.maxRetries,
-    );
-    return response.planets;
+    return getPlanets(msg => logger(this.name, msg));
   }
 
   async ApiGetPlanet(planetId) {
-    const response = await this.RequestAPI(
-      'ITerritoryControlMinigameService/GetPlanet',
-      [`id=${planetId}`, 'language=english'],
-      this.maxRetries,
-    );
-    return response.planets[0];
-  }
-
-  async ApiGetPlayerInfo() {
-    const response = await this.RequestAPI(
-      'ITerritoryControlMinigameService/GetPlayerInfo',
-      [`access_token=${this.token}`],
-      this.maxRetries,
-      { method: 'POST' },
-    );
-    return response;
+    return getPlanet(planetId, msg => logger(this.name, msg));
   }
 
   async ApiRepresentClan(clanId) {
-    const response = await this.RequestAPI(
-      'ITerritoryControlMinigameService/RepresentClan',
-      [`access_token=${this.token}`, `clanid=${clanId}`],
-      this.maxRetries,
-      { method: 'POST' },
-    );
-    return response;
+    return representClan(this.token, clanId, msg => logger(this.name, msg));
   }
 
   async ApiLeaveGame(gameId) {
-    const response = await this.RequestAPI(
-      'IMiniGameService/LeaveGame',
-      [`access_token=${this.token}`, `gameid=${gameId}`],
-      this.maxRetries,
-      { method: 'POST' },
-    );
-    return response;
+    return leaveGame(this.token, gameId, msg => logger(this.name, msg));
   }
 
   async ApiJoinPlanet(planetId) {
-    const response = await this.RequestAPI(
-      'ITerritoryControlMinigameService/JoinPlanet',
-      [`access_token=${this.token}`, `id=${planetId}`],
-      this.maxRetries,
-      { method: 'POST' },
-    );
-    return response;
+    return joinPlanet(this.token, planetId, msg => logger(this.name, msg));
   }
 
   async ApiJoinZone(zoneId) {
-    const response = await this.RequestAPI(
-      'ITerritoryControlMinigameService/JoinZone',
-      [`access_token=${this.token}`, `zone_position=${zoneId}`],
-      this.maxRetries,
-      { method: 'POST' },
-    );
-    return response;
+    return joinZone(this.token, zoneId, msg => logger(this.name, msg));
   }
 
   async ApiReportScore(score) {
-    const response = await this.RequestAPI(
-      'ITerritoryControlMinigameService/ReportScore',
-      [`access_token=${this.token}`, `score=${score}`, `language=english`],
-      this.maxRetries,
-      { method: 'POST' },
-    );
-    return response;
+    return reportScore(this.token, score, msg => logger(this.name, msg));
   }
 
   async leaveCurrentGame(leaveCurrentPlanet = 0) {
@@ -299,7 +200,7 @@ class SalienScript {
     }
 
     if (this.clan && !this.hasJoinedClan && playerInfo.clan_info && playerInfo.clan_info.accountid !== this.clan) {
-      logger(this.name, `   Attempting to join groupId: ${chalk.yellow(this.clan)}`);
+      logger(this.name, { message: `Attempting to join groupId: ${chalk.yellow(this.clan)}` });
 
       await this.ApiRepresentClan(this.clan);
 
@@ -310,11 +211,9 @@ class SalienScript {
       }
 
       if (clanCheckInfo.clan_info) {
-        logger(this.name, `   ${chalk.bgCyan(` Joined group: ${clanCheckInfo.clan_info.name} `)}`);
-        logger(
-          this.name,
-          `   ${chalk.yellow("If the name above isn't expected, check if you're actually a member of that group")}`,
-        );
+        logger(this.name, { message: `${chalk.bgCyan(` Joined group: ${clanCheckInfo.clan_info.name} `)}` });
+        const unexpected = "If the name above isn't expected, check if you're actually a member of that group";
+        logger(this.name, { message: `${chalk.yellow(unexpected)}` });
       }
 
       this.hasJoinedClan = true;
@@ -327,10 +226,10 @@ class SalienScript {
     const activePlanet = playerInfo.active_planet;
 
     if (leaveCurrentPlanet > 0 && leaveCurrentPlanet !== activePlanet) {
-      logger(
-        this.name,
-        `>> Leaving planet ${chalk.yellow(activePlanet)}, because we want to be on ${chalk.yellow(leaveCurrentPlanet)}`,
-      );
+      let leaving = `>> Leaving planet ${chalk.yellow(activePlanet)}, because`;
+      leaving += `we want to be on ${chalk.yellow(leaveCurrentPlanet)}`;
+
+      logger(this.name, { message: leaving });
 
       await this.ApiLeaveGame(activePlanet);
     }
@@ -369,7 +268,7 @@ class SalienScript {
       }
 
       if (zone.type !== 3) {
-        logger(this.name, chalk.red(`!! Unknown zone type: ${zone.type}`));
+        logger(this.name, { message: chalk.red(`!! Unknown zone type: ${zone.type}`) });
       }
 
       // If a zone is close to completion, skip it because Valve does not reward points and replies with 42 NoMatch
@@ -439,7 +338,7 @@ class SalienScript {
   }
 
   async isThereAnyNewPlanets(knownPlanetIds) {
-    logger(this.name, '   Checking for any new planets...');
+    logger(this.name, { message: 'Checking for any new planets...' });
 
     let planets;
 
@@ -469,7 +368,7 @@ class SalienScript {
       throw new SalienScriptException("Didn't find any planets.");
     }
 
-    logger(this.name, '   Getting first available planet...');
+    logger(this.name, { message: 'Getting first available planet...' });
 
     try {
       // Patch the apiGetPlanets response with zones from apiGetPlanet
@@ -500,7 +399,7 @@ class SalienScript {
           if (zone.type === 4) {
             hasBossZone = true;
           } else if (zone.type !== 3) {
-            logger(this.name, chalk.red(`!! Unknown zone type: ${zone.type}`));
+            logger(this.name, { message: chalk.red(`!! Unknown zone type: ${zone.type}`) });
           }
 
           switch (zone.difficulty) {
@@ -540,10 +439,10 @@ class SalienScript {
         logMsg += ` - Players: ${chalk.yellow(planet.state.current_players.toLocaleString())}`;
         logMsg += ` (${chalk.green(planetName)})`;
 
-        logger(this.name, logMsg);
+        logger(this.name, { message: logMsg });
 
         if (unknownZones) {
-          logger(this.name, `>> Unknown zones found: ${chalk.yellow(unknownZones)}`);
+          logger(this.name, { message: `>> Unknown zones found: ${chalk.yellow(unknownZones)}` });
         }
       });
 
@@ -557,10 +456,10 @@ class SalienScript {
       });
     } catch (e) {
       if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
-        logger(
-          this.name,
-          chalk.green(`>> Planet ${chalk.yellow(this.currentPlanetId)} has a boss zone, selecting this planet`),
-        );
+        let bossZoneMsg = chalk.green(`>> Planet ${chalk.yellow(this.currentPlanetId)}`);
+        bossZoneMsg += ` has a boss zone, selecting this planet`;
+
+        logger(this.name, { message: bossZoneMsg });
       } else {
         debug(e);
         throw new SalienScriptException(e.message);
@@ -597,7 +496,7 @@ class SalienScript {
           if (!planet.state.captured && !this.currentPlanetId) {
             const planetName = formatPlanetName(planet.state.name);
 
-            logger(this.name, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
+            logger(this.name, { message: `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})` });
 
             this.currentPlanetId = planetId;
           }
@@ -681,20 +580,20 @@ class SalienScript {
     planetLogMsg += ` - Easy: ${chalk.yellow(easyZones)}`;
     planetLogMsg += ` - Players: ${chalk.yellow(planetPlayers.toLocaleString())} (${chalk.green(planetName)})`;
 
-    logger(this.name, planetLogMsg);
+    logger(this.name, { message: planetLogMsg });
 
     const capturedProgress = !zoneInfo.capture_progress ? 0 : getPercentage(zoneInfo.capture_progress).toString();
 
     let zoneLogMsg = `>> Zone ${chalk.green(zoneInfo.zone_position)} - Captured: ${chalk.yellow(capturedProgress)}%`;
     zoneLogMsg += ` - Difficulty: ${chalk.yellow(getDifficultyName(zoneInfo))}`;
 
-    logger(this.name, zoneLogMsg);
+    logger(this.name, { message: zoneLogMsg });
 
     if (zoneInfo.top_clans) {
-      logger(this.name, `-- Top Clans:${zoneInfo.top_clans.map(({ name }) => ` ${name}`)}`);
+      logger(this.name, { message: `-- Top Clans:${zoneInfo.top_clans.map(({ name }) => ` ${name}`)}` });
     }
 
-    logger(this.name, `   ${chalk.bgMagenta(` Waiting ${this.waitTime} seconds for round to finish... `)}`);
+    logger(this.name, { message: `${chalk.bgMagenta(` Waiting ${this.waitTime} seconds for round to finish... `)}` });
 
     await delay(this.waitTime * 1000);
 
@@ -709,7 +608,7 @@ class SalienScript {
       currentLevelMsg += ` => ${chalk.green(report.new_score.toLocaleString())} XP)`;
       currentLevelMsg += ` - Current Level: ${chalk.green(report.new_level)} (${nextLevelPercent}% to next)`;
 
-      logger(this.name, currentLevelMsg);
+      logger(this.name, { message: currentLevelMsg });
 
       const remainingXp = report.next_level_score - report.new_score;
 
@@ -722,7 +621,7 @@ class SalienScript {
       let nextLevelMsg = `>> Next Level: ${chalk.yellow(report.next_level_score.toLocaleString())} XP`;
       nextLevelMsg += ` - Remaining: ${chalk.yellow(remainingXp.toLocaleString())} XP - ETA: ${chalk.green(levelEta)}`;
 
-      logger(this.name, nextLevelMsg);
+      logger(this.name, { message: nextLevelMsg });
     }
 
     // Some users get stuck in games after calling ReportScore, so we manually leave to fix this
@@ -747,11 +646,11 @@ class SalienScript {
     this.skippedPlanets = [];
 
     try {
-      logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}`);
-      logger(
-        this.name,
-        `   ${chalk.bgCyan(` If you appreciate the script, please remember to leave a ⭐ star ⭐ on the project! `)}`,
-      );
+      logger(this.name, { message: `${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}` });
+
+      const starme = ` If you appreciate the script, please remember to leave a ⭐ star ⭐ on the project! `;
+
+      logger(this.name, { message: `${chalk.bgCyan(starme)}` });
 
       await this.setupGame();
 
@@ -760,13 +659,15 @@ class SalienScript {
         await this.gameLoop();
       }
     } catch (e) {
-      logger(this.name, `   ${chalk.bgRed(`${e.name}:`)} ${chalk.red(e.message)}`);
+      logger(this.name, { message: `${chalk.bgRed(`${e.name}:`)} ${chalk.red(e.message)}` });
 
       if (e.name !== 'SalienScriptRestart') {
         debug(e);
       }
 
-      logger(this.name, `   ${chalk.bgMagenta(` Script will restart in ${this.defaultDelaySec} seconds... `)}\n\n`);
+      const restartMsg = `${chalk.bgMagenta(` Script will restart in ${this.defaultDelaySec} seconds... `)}\n\n`;
+
+      logger(this.name, { message: restartMsg });
 
       await delay(this.defaultDelayMs);
 
