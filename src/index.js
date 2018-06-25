@@ -87,9 +87,10 @@ const formatPlanetName = name =>
 // the first planet, sending a score ... etc can all be abstracted out.
 
 class SalienScript {
-  constructor({ token, clan, name = null }) {
+  constructor({ token, clan, selectedPlanetId, name = null }) {
     this.token = token;
     this.clan = clan;
+    this.selectedPlanetId = selectedPlanetId;
     this.name = name;
 
     this.defaultDelayMs = 5000;
@@ -437,22 +438,43 @@ class SalienScript {
         return Number(planetA.id) - Number(planetB.id);
       });
 
-      for (let i = 0; i < priority.length; i += 1) {
-        sortedPlanetIds.forEach(planetId => {
-          const planet = this.knownPlanets.get(planetId);
+      // Attempt to get selected planet from provided planet id
+      const selectedPlanet = this.knownPlanets.get(this.selectedPlanetId);
 
-          if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
-            return;
-          }
+      // If the selected planet is not valid, handle it
+      if (!selectedPlanet || this.skippedPlanets.includes(this.selectedPlanetId)) {
+        // Only log if a planet was selected
+        if (this.selectedPlanetId) {
+          logger(
+            this.name,
+            `>> Selected planet ${chalk.yellow(
+              this.selectedPlanetId,
+            )} not available. Selecting next available planet...`,
+          );
+        }
+        for (let i = 0; i < priority.length; i += 1) {
+          sortedPlanetIds.forEach(planetId => {
+            const planet = this.knownPlanets.get(planetId);
 
-          if (!planet.state.captured && !this.currentPlanetId) {
-            const planetName = formatPlanetName(planet.state.name);
+            if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
+              return;
+            }
 
-            logger(this.name, { message: `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})` });
+            if (!planet.state.captured && !this.currentPlanetId) {
+              const planetName = formatPlanetName(planet.state.name);
 
-            this.currentPlanetId = planetId;
-          }
-        });
+              logger(this.name, {
+                message: `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`,
+              });
+
+              this.currentPlanetId = planetId;
+            }
+          });
+        }
+      } else if (!selectedPlanet.state.captured && !this.currentPlanetId) {
+        const planetName = formatPlanetName(selectedPlanet.state.name);
+        logger(this.name, `>> Selected planet ${chalk.green(this.selectedPlanetId)} (${chalk.green(planetName)})`);
+        this.currentPlanetId = this.selectedPlanetId;
       }
 
       if (!this.currentPlanetId) {
