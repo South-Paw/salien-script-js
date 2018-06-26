@@ -1,15 +1,22 @@
 const SalienScript = require('./src/index.js');
 
-const SALIEN_CONFIG = process.env.SALIEN_CONFIG;
+let configs;
 
-for (let config_str of SALIEN_CONFIG.split(';')) {
-    [token, clan, name] = config_str.split(':');
-    const config = {
-        token: token,
-        clan: clan,
-        name: name,
-    };
+if (process.env.SALIEN_CONFIG_V2) {
+    configs = JSON.parse(process.env.SALIEN_CONFIG_V2);
+} else if (process.env.SALIEN_CONFIG) {
+    configs = [];
+    for (let config of process.env.SALIEN_CONFIG.split(';')) {
+        let token, clan, name;
+        [token, clan, name] = config.split(':');
+        configs.push({
+            token: token,
+            clan: clan,
+            name: name,
+        });
+    }
+}
 
-    const salien = new SalienScript(config);
-    salien.init();
+for (let config of configs) {
+    new SalienScript(config).init();
 }
