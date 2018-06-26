@@ -194,7 +194,9 @@ class SalienScript {
   async init() {
     this.startTime = new Date().getTime();
 
-    this.logger('welcome message - unimplemented');
+    this.logger(chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `));
+    this.logger(chalk.bgCyan(' Thanks for choosing https://github.com/South-Paw/salien-script-js '));
+    this.logger(chalk.bgCyan(' Remeber to drop us a star on the project if you appreciate this script! '));
 
     this.resetScript();
 
