@@ -36,9 +36,9 @@ const updateCheck = async name => {
   try {
     hasUpdate = await checkForUpdate(pkg, { interval: 120000 });
   } catch (err) {
-    const updateMsg = `${chalk.bgRed(' UpdateCheck ')} ${chalk.red(`Failed to check for updates: ${err}`)}`;
+    const updateMsg = `${chalk.bgRed(' UpdateCheck ')} ${chalk.red(`Error while checking for updates: ${err}`)}`;
 
-    utilLogger(name, { message: updateMsg });
+    utilLogger(name, { message: updateMsg, error: err });
   }
 
   if (await hasUpdate) {

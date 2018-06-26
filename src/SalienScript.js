@@ -12,8 +12,9 @@ const {
   reportScore,
 } = require('./api/index');
 const { getZoneDifficultyName, getScoreForZone, getAllPlanetStates, getBestPlanetAndZone } = require('./game/index');
-const { SalienScriptException, SalienScriptRestart } = require('./exceptions');
-const { utilLogger, getPercentage } = require('./util');
+const { SalienScriptRestart } = require('./exceptions');
+const { getPercentage, updateCheck, utilLogger } = require('./util');
+const pkg = require('../package.json');
 
 class SalienScript {
   constructor({ token, clan, name = null }) {
@@ -105,12 +106,9 @@ class SalienScript {
     return activePlanet;
   }
 
+  // TODO
   async doClanSetup() {
     this.logger('doClanSetup - unimplemented');
-  }
-
-  async doUpdateCheck() {
-    this.logger('doUpdateCheck - unimplemented');
   }
 
   async doGameSetup() {
@@ -209,7 +207,7 @@ class SalienScript {
       while (true) {
         console.log(''); // eslint-disable-line no-console
 
-        await this.doUpdateCheck();
+        await updateCheck(this.name);
 
         await this.doGameLoop();
       }
