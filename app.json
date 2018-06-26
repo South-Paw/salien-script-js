@@ -3,8 +3,8 @@
     "description": "Scripting the Steam Salien Sale minigame, the proper way.",
     "repository": "https://github.com/South-Paw/salien-script-js",
     "env": {
-        "SALIEN_CONFIG": {
-            "description": "A config string for salien script.",
+        "SALIEN_CONFIG_V2": {
+            "description": "A config JSON for salien script.",
             "value": ""
         }
     },
