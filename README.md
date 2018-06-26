@@ -124,6 +124,8 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 
 To check if it works, visit logs at https://dashboard.heroku.com/apps/[YOUR_APP_NAME]/logs
 
+"Application error" on web page of your app is fine - it is not related to salien dyno.
+
 ### Deploying with Heroku CLI
 
 ```bash
@@ -144,16 +146,41 @@ $ heroku logs --tail
 
 `SALIEN_CONFIG_V2` is just an array of config that will be passed to `SalienScript` constructor.
 
-For example, if you have two accounts, 
-one with token `123` representing group with id `12345` that should appear in logs by name `first_acc`, 
-and another with token `456` representing group with id `67890` that should appear in logs by name `second_acc`, 
-then your config would look like:
+If you only have one account, then your config will look like this:
+
+```JSON
+[
+    {
+        "token": "12345"
+    }
+]
+```
+
+The only mandatory key for each account is `token` and you can add extra keys to this config such as `clan`, `name` or `selectedPlanetId`:
+
+```JSON
+[
+    {
+        "token": "12345",
+        "clan": "67890",
+        "name": "first_acc",
+        "selectedPlanetId": "28"
+    }
+]
+```
+
+If you had two accounts for example;
+
+* one named `first_acc` with a token of `123` and a group of `98712`
+* one named `second_acc` with a token of `456` and a group of `67890`
+
+then you would make your config look like this:
 
 ```JSON
 [
     {
         "token": "123",
-        "clan": "12345",
+        "clan": "98712",
         "name": "first_acc"
     },
     {
@@ -164,21 +191,15 @@ then your config would look like:
 ]
 ```
 
-If you have only one account, then this config should be enough:
-
-```JSON
-[
-    {
-        "token": "123",
-        "clan": "12345",
-        "name": "first_acc"
-    }
-]
-```
-
-You can also remove `clan` and `name` keys or add `selectedPlanetId` key. The only mandatory key for each account is `token`.
-
 ### Updating
+
+#### Easy
+
+The easiest way to update script on heroku is to just delete your old app and create new.
+
+Also, you can link your heroku app to dropbox account, download this repository as zip archive and unpack it to selected folder.
+
+#### Hard
 
 If you created your app using web-console, you need to clone heroku repo first
 
