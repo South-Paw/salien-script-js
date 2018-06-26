@@ -162,6 +162,9 @@ class SalienScript {
 
     this.logger(`${chalk.bgMagenta(` Waiting ${this.gameWaitTimeSec} seconds for round to finish... `)}`);
 
+    // TODO at about 100 out of 110 seconds we need to call for planets which will set the this variables
+    // and then the loop will kick off with the next best fresh zone every time...
+
     await delay(this.gameWaitTimeSec * 1000);
 
     const score = await this.apiReportScore(getScoreForZone(zoneInfo));
@@ -183,6 +186,8 @@ class SalienScript {
         }
       */
     }
+
+    await this.doGameSetup();
 
     const leavingGame = await this.leaveCurrentGame(this.currentPlanetAndZone.id);
 
