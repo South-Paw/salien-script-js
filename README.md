@@ -119,8 +119,7 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 1. Click the button above.
-2. Set SALIEN_CONFIG (`token1:group1:name1;token2:group2:name2...`).
-![Heroku-Config](https://i.imgur.com/07KcyVC.png)
+2. Set SALIEN_CONFIG_V2 (see note below).
 3. That's all!
 
 ### Deploying with Heroku CLI
@@ -129,9 +128,30 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 $ git clone https://github.com/South-Paw/salien-script-js -o upstream
 $ cd salien-script-js
 $ heroku create [APP_NAME]
-$ heroku config:set "SALIEN_CONFIG=token1:group1:name1;token2:group2:name2..."
+$ heroku config:set "SALIEN_CONFIG_V2=[APP_CONFIG]"
 $ git push heroku master
 $ heroku ps:scale web=0 salien=1
+```
+
+### Heroku configuration
+
+`SALIEN_CONFIG_V2` is just an array of config that will be passed to `SalienScript` constructor.
+
+For example:
+
+```JSON
+[
+    {
+        "token": "token1",
+        "clan": "clan1",
+        "name": "name1"
+    },
+    {
+        "token": "token2",
+        "clan": "clan2",
+        "name": "name2"
+    }
+]
 ```
 
 ### Updating
