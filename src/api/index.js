@@ -38,21 +38,21 @@ const doFetch = async (method, params, requestOptions = {}, logger, maxRetries, 
   while (!response && attempts < maxRetries) {
     try {
       if (logger) {
-        logger({ message: chalk.blue(`Sending ${method}...`) });
+        logger(chalk.blue(`Sending ${method}...`));
       }
 
       request = await fetch(url, options);
       response = await request.json();
     } catch (e) {
       if (logger) {
-        logger({ message: `${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`, error: e });
+        logger(`${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`, e);
       }
 
       attempts += 1;
 
       if (attempts < maxRetries) {
         if (logger) {
-          logger({ message: `Retrying ${method} in ${retryDelayMs / 1000} seconds...` });
+          logger(`Retrying ${method} in ${retryDelayMs / 1000} seconds...`);
         }
       } else {
         throw new SalienScriptException(`Failed to send ${method} after ${attempts} attempts`);

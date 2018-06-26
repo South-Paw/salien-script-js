@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
 const meow = require('meow');
-const SalienScript = require('./src/index.js');
+const { SalienScript } = require('../src/index.js');
 
-/** @type {meow.Options} */
 const cliOptions = {
   flags: {
     token: {
@@ -27,14 +26,15 @@ const cliOptions = {
 
 const cli = meow(
   `
-    Usage
+    Usage:
       salien-script-js [options]
 
-    Options
-      --token, -t     Your game token.
-      --group, -g     The ID of a steam group you'd like to represent. (optional)
-      --planet, -p    Select planet to fight on. (optional)
-      --name, -n      Name this instance of the script. (optional)
+    Options:
+      --token, -t     Your Saliens game token.
+
+      --group, -g     (Optional) The ID of a steam group you'd like to represent.
+
+      --name, -n      (Optional) The name to display on this instance of the script.
 `,
   cliOptions,
 );
@@ -43,7 +43,6 @@ if (cli.flags.token) {
   const salien = new SalienScript({
     token: cli.flags.token,
     clan: cli.flags.group,
-    selectedPlanetId: cli.flags.planet,
     name: cli.flags.name,
   });
 

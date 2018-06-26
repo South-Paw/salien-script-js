@@ -6,7 +6,7 @@ const pkg = require('../package.json');
 
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`); // eslint-disable-line no-console
 
-const logger = (name, msg) => {
+const utilLogger = (name, msg) => {
   const { message, error } = msg;
 
   let prefix = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
@@ -25,7 +25,10 @@ const logger = (name, msg) => {
   }
 };
 
-const getPercentage = number => Number(number * 100).toFixed(2);
+const getPercentage = number =>
+  Number(number * 100)
+    .toFixed(2)
+    .toString();
 
 const updateCheck = async name => {
   let hasUpdate = null;
@@ -35,19 +38,19 @@ const updateCheck = async name => {
   } catch (err) {
     const updateMsg = `${chalk.bgRed(' UpdateCheck ')} ${chalk.red(`Failed to check for updates: ${err}`)}`;
 
-    logger(name, { message: updateMsg });
+    utilLogger(name, { message: updateMsg });
   }
 
   if (await hasUpdate) {
     let hasUpdateMsg = `${chalk.bgMagenta(' UpdateCheck ')} `;
     hasUpdateMsg += `The latest version is ${chalk.bgCyan(hasUpdate.latest)}. Please update!`;
 
-    logger(name, { message: hasUpdateMsg });
+    utilLogger(name, { message: hasUpdateMsg });
 
     let howToUpdate = `${chalk.bgMagenta(' UpdateCheck ')} `;
     howToUpdate += `To update, stop this script and run: ${chalk.bgCyan('npm i -g salien-script-js')}`;
 
-    logger(name, { message: howToUpdate });
+    utilLogger(name, { message: howToUpdate });
 
     // eslint-disable-next-line
     console.log('');
@@ -56,7 +59,7 @@ const updateCheck = async name => {
 
 module.exports = {
   debug,
-  logger,
+  utilLogger,
   getPercentage,
   updateCheck,
 };

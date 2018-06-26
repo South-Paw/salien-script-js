@@ -18,10 +18,11 @@
 * ✉️ [Update checker and log notifications](#-how-to-update-the-script)
 * 👽 Same logic as the [PHP version](https://github.com/SteamDatabase/SalienCheat) (we almost have parity)
 
+
 * 👌 [Pick your own steam group](#-represent-your-steam-group-optional)
-* 🌎 [Pick your own planet](#-select-a-planet-optional)
 * 👥 [Works well with multiple tokens/scripts](#-multiple-tokensscripts)
 * 👀 [Name your running scripts](#-multiple-tokensscripts)
+
 
 * 📦 [npm package export](#advanced--usage-as-an-npm-package)
 * 🐳 [Docker support](#advanced--running-as-a-docker-container)
@@ -70,14 +71,6 @@ If you'd like to team up with an established larger group please consider using 
 * [/r/saliens](https://steamcommunity.com/groups/summersaliens) id: `103582791462557324`
 * [SteamDB](https://steamcommunity.com/groups/steamdb) id: `103582791434298690`
 * [100Pals](https://steamcommunity.com/groups/100pals) id: `103582791454524084`
-
-### 🌎 Select a planet (Optional)
-
-If you would like to override planet selection in favor of a particular one, provide the `--planet` CLI option with the planet ID.
-
-```sh-session
-salien-script-js --token xxxxxxxx --planet 15
-```
 
 ### 👥 Multiple tokens/scripts
 

@@ -30,11 +30,11 @@
     }
   ],
   "files": [
-    "src",
-    "cli.js"
+    "bin",
+    "src"
   ],
   "bin": {
-    "salien-script-js": "./cli.js"
+    "salien-script-js": "./bin/cli.js"
   },
   "main": "src/index.js",
   "repository": {
