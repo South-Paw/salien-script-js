@@ -119,8 +119,8 @@ class SalienScript {
 
     const zoneCapturePercent = getPercentage(this.currentPlanetAndZone.bestZone.capture_progress);
 
-    let zoneMsg = `>> Selected Planet ${chalk.green(`${this.currentPlanetAndZone.id}`.padStart(3))}`;
-    zoneMsg += ` Zone ${chalk.green(`${this.currentPlanetAndZone.bestZone.zone_position}`.padStart(3))}`;
+    let zoneMsg = `>> Selected Zone ${chalk.green(`${this.currentPlanetAndZone.bestZone.zone_position}`.padStart(3))}`;
+    zoneMsg += ` on Planet ${chalk.green(`${this.currentPlanetAndZone.id}`.padStart(3))}`;
     zoneMsg += ` (Captured: ${chalk.yellow(`${zoneCapturePercent}%`.padStart(6))}`;
     zoneMsg += ` - Difficulty: ${chalk.yellow(getZoneDifficultyName(this.currentPlanetAndZone.bestZone))})`;
 
@@ -151,8 +151,8 @@ class SalienScript {
 
     let joinMsg = `>> Joined Zone ${chalk.green(`${zoneInfo.zone_position}`.padStart(3))}`;
     joinMsg += ` on Planet ${chalk.green(`${this.currentPlanetAndZone.id}`.padStart(3))}`;
-    joinMsg += ` - Captured: ${chalk.yellow(`${zoneCapturePercent}%`.padStart(6))}`;
-    joinMsg += ` - Difficulty: ${chalk.yellow(getZoneDifficultyName(this.currentPlanetAndZone.bestZone))}`;
+    joinMsg += ` (Captured: ${chalk.yellow(`${zoneCapturePercent}%`.padStart(6))}`;
+    joinMsg += ` - Difficulty: ${chalk.yellow(getZoneDifficultyName(this.currentPlanetAndZone.bestZone))})`;
 
     this.logger(joinMsg);
 

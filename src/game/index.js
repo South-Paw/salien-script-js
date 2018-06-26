@@ -1,16 +1,7 @@
 const chalk = require('chalk');
 
-const {
-  getPlayerInfo,
-  getPlanets,
-  getPlanet,
-  representClan,
-  leaveGame,
-  joinPlanet,
-  joinZone,
-  reportScore,
-} = require('../api/index');
-const { SalienScriptException, SalienScriptRestart } = require('../exceptions');
+const { getPlanet } = require('../api/index');
+const { SalienScriptException } = require('../exceptions');
 const { getPercentage } = require('../util');
 
 const formatPlanetName = name =>
