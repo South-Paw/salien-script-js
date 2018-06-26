@@ -4,11 +4,10 @@
 
 > A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw) with additional features!
 
-[![salien-script-js on npm](https://nodei.co/npm/salien-script-js.png)](https://nodei.co/npm/salien-script-js/)
-
-[![CI Status](https://img.shields.io/travis/South-Paw/salien-script-js/rework.svg)](https://travis-ci.org/South-Paw/salien-script-js)
-[![Dependencies](https://david-dm.org/South-Paw/salien-script-js/rework.svg)](https://david-dm.org/South-Paw/salien-script-js/rework)
-[![Dev Dependencies](https://david-dm.org/South-Paw/salien-script-js/rework/dev-status.svg)](https://david-dm.org/South-Paw/salien-script-js/rework?type=dev)
+[![npm](https://img.shields.io/npm/v/salien-script-js.svg)](https://www.npmjs.com/package/salien-script-js)
+[![CI Status](https://img.shields.io/travis/South-Paw/salien-script-js.svg)](https://travis-ci.org/South-Paw/salien-script-js)
+[![Dependencies](https://david-dm.org/South-Paw/salien-script-js.svg)](https://david-dm.org/South-Paw/salien-script-js)
+[![Dev Dependencies](https://david-dm.org/South-Paw/salien-script-js/dev-status.svg)](https://david-dm.org/South-Paw/salien-script-js?type=dev)
 
 ---
 
@@ -63,6 +62,8 @@ If you'd like to team up with an established larger group please consider using 
 
 * [100Pals](https://steamcommunity.com/groups/100pals) id: `103582791454524084`
 * [SteamDB](https://steamcommunity.com/groups/steamdb) id: `103582791434298690`
+* [/r/saliens](https://steamcommunity.com/groups/summersaliens) id: `103582791462557324`
+* [Steam Universe](https://steamcommunity.com/groups/steamuniverse) id: `103582791434672565`
 
 ### 👥 Multiple tokens/scripts
 

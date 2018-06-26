@@ -30,15 +30,17 @@ const checkForUpdate = require('update-check');
 
 const pkg = require('../package.json');
 
-const logger = (name, ...messages) => {
+const logger = (name, maxlogginlevel, loginglevel, ...messages) => {
   let message = chalk.white(dateFormat(new Date(), '[HH:MM:ss]'));
 
-  if (name) {
-    message += ` (${name})`;
-  }
+  if(maxlogginlevel >= loginglevel){
+    if (name) {
+      message += ` (${name})`;
+    }
 
-  // eslint-disable-next-line no-console
-  console.log(message, ...messages);
+    // eslint-disable-next-line no-console
+    console.log(message, ...messages);
+  }
 };
 
 // eslint-disable-next-line no-console
@@ -88,23 +90,17 @@ const formatPlanetName = name =>
     .split('_')
     .join(' ');
 
-const updateCheck = async (name, pauseLog) => {
+const updateCheck = async name => {
   let hasUpdate = null;
 
   try {
-    hasUpdate = await checkForUpdate(pkg);
-    this.isUpdateChecked = true;
+    hasUpdate = await checkForUpdate(pkg, { interval: 120000 });
   } catch (err) {
-    logger(name, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
+    logger(name, 2, 1, `   ${chalk.bgRed(' UpdateCheck ')}`, chalk.red(`Failed to check for updates: ${err}`));
   }
 
-  if (hasUpdate) {
-    logger(name, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update.`);
-  }
-
-  if (pauseLog) {
-    // pause for 3 seconds after update check
-    await delay(3000);
+  if (await hasUpdate) {
+    logger(name, 2, 1, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update!`);
   }
 };
 
@@ -123,10 +119,11 @@ class SalienScriptRestart {
 }
 
 class SalienScript {
-  constructor({ token, clan, name = null }) {
+  constructor({ token, clan, name = null, logs = 2 }) {
     this.token = token;
     this.clan = clan;
     this.name = name;
+    this.logs = logs;
 
     this.maxRetries = 2;
     this.defaultDelayMs = 5000;
@@ -176,20 +173,20 @@ class SalienScript {
 
     while (!response && retries < maxRetries) {
       try {
-        logger(this.name, chalk.blue(`   Sending ${method}...`));
+        logger(this.name, this.logs, 2, chalk.blue(`   Sending ${method}...`));
         request = await fetch(url, options);
         response = await request.json();
       } catch (e) {
         // TODO there is some error handling/messaging we could implement here
         // see: https://github.com/SteamDatabase/SalienCheat/blob/ac3a28aeb0446ff80cf6a6e1370fd5ef42e75aa2/cheat.php#L533
 
-        logger(this.name, `   ${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`);
+        logger(this.name, this.logs, 1, `   ${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`);
         debug(e);
 
         retries += 1;
 
         if (retries < maxRetries) {
-          logger(this.name, chalk.yellow(`   Retrying ${method} in ${this.defaultDelaySec} seconds...`));
+          logger(this.name, this.logs, 2, chalk.yellow(`   Retrying ${method} in ${this.defaultDelaySec} seconds...`));
         } else {
           throw new SalienScriptException(`Failed ${method} after ${retries} retries`);
         }
@@ -291,7 +288,7 @@ class SalienScript {
     }
 
     if (this.clan && !this.hasJoinedClan && playerInfo.clan_info && playerInfo.clan_info.accountid !== this.clan) {
-      logger(this.name, `   Attempting to join groupId: ${chalk.yellow(this.clan)}`);
+      logger(this.name, this.logs, 1, `   Attempting to join groupId: ${chalk.yellow(this.clan)}`);
 
       await this.ApiRepresentClan(this.clan);
 
@@ -302,9 +299,11 @@ class SalienScript {
       }
 
       if (clanCheckInfo.clan_info) {
-        logger(this.name, `   ${chalk.bgCyan(` Joined group: ${clanCheckInfo.clan_info.name} `)}`);
+        logger(this.name, this.logs, 1, `   ${chalk.bgCyan(` Joined group: ${clanCheckInfo.clan_info.name} `)}`);
         logger(
           this.name,
+          this.logs,
+          2,
           `   ${chalk.yellow("If the name above isn't expected, check if you're actually a member of that group")}`,
         );
       }
@@ -321,6 +320,8 @@ class SalienScript {
     if (leaveCurrentPlanet > 0 && leaveCurrentPlanet !== activePlanet) {
       logger(
         this.name,
+        this.logs,
+        1,
         `Leaving planet ${chalk.yellow(activePlanet)}, because we want to be on ${chalk.yellow(leaveCurrentPlanet)}`,
       );
 
@@ -361,7 +362,7 @@ class SalienScript {
       }
 
       if (zone.type !== 3) {
-        logger(this.name, chalk.red(`!! Unknown zone type: ${zone.type}`));
+        logger(this.name, this.logs, 1, chalk.red(`!! Unknown zone type: ${zone.type}`));
       }
 
       // If a zone is close to completion, skip it because Valve does not reward points and replies with 42 NoMatch
@@ -431,7 +432,7 @@ class SalienScript {
   }
 
   async isThereAnyNewPlanets(knownPlanetIds) {
-    logger(this.name, '   Checking for any new planets...');
+    logger(this.name, this.logs, 2, '   Checking for any new planets...');
 
     let planets;
 
@@ -492,7 +493,7 @@ class SalienScript {
           if (zone.type === 4) {
             hasBossZone = true;
           } else if (zone.type !== 3) {
-            logger(this.name, chalk.red(`!! Unknown zone type: ${zone.type}`));
+            logger(this.name, this.logs, 1, chalk.red(`!! Unknown zone type: ${zone.type}`));
           }
 
           switch (zone.difficulty) {
@@ -532,10 +533,10 @@ class SalienScript {
         logMsg += ` - Players: ${chalk.yellow(planet.state.current_players.toLocaleString())}`;
         logMsg += ` (${chalk.green(planetName)})`;
 
-        logger(this.name, logMsg);
+        logger(this.name, this.logs, 2, logMsg);
 
         if (unknownZones) {
-          logger(this.name, `>> Unknown zones found: ${chalk.yellow(unknownZones)}`);
+          logger(this.name, this.logs, 2, `>> Unknown zones found: ${chalk.yellow(unknownZones)}`);
         }
 
         if (hasBossZone) {
@@ -544,7 +545,17 @@ class SalienScript {
         }
       });
     } catch (e) {
-      throw new SalienScriptException(e.message);
+      if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
+        logger(
+          this.name,
+          this.logs,
+          1,
+          chalk.green(`>> Planet ${chalk.yellow(this.currentPlanetId)} has a boss zone, selecting this planet`),
+        );
+      } else {
+        debug(e);
+        throw new SalienScriptException(e.message);
+      }
     }
 
     // FIXME this logic might be able to be cleaned up
@@ -577,7 +588,7 @@ class SalienScript {
           if (!planet.state.captured && !this.currentPlanetId) {
             const planetName = formatPlanetName(planet.state.name);
 
-            logger(this.name, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
+            logger(this.name, this.logs, 1, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
 
             this.currentPlanetId = planetId;
           }
@@ -664,24 +675,24 @@ class SalienScript {
     planetLogMsg += ` - Easy: ${chalk.yellow(easyZones)}`;
     planetLogMsg += ` - Players: ${chalk.yellow(planetPlayers.toLocaleString())} (${chalk.green(planetName)})`;
 
-    logger(this.name, planetLogMsg);
+    logger(this.name, this.logs, 1, planetLogMsg);
 
     const capturedProgress = !zoneInfo.capture_progress ? 0 : getPercentage(zoneInfo.capture_progress).toString();
 
     let zoneLogMsg = `>> Zone ${chalk.green(zoneInfo.zone_position)} - Captured: ${chalk.yellow(capturedProgress)}%`;
     zoneLogMsg += ` - Difficulty: ${chalk.yellow(getDifficultyName(zoneInfo))}`;
 
-    logger(this.name, zoneLogMsg);
+    logger(this.name, this.logs, 1, zoneLogMsg);
 
     if (zoneInfo.top_clans) {
-      logger(this.name, `-- Top Clans:${zoneInfo.top_clans.map(({ name }) => ` ${name}`)}`);
+      logger(this.name, this.logs, 2, `-- Top Clans:${zoneInfo.top_clans.map(({ name }) => ` ${name}`)}`);
     }
 
-    logger(this.name, `   ${chalk.bgMagenta(` Waiting ${this.waitTime} seconds for round to finish... `)}`);
+    logger(this.name, this.logs, 1, `   ${chalk.bgMagenta(` Waiting ${this.waitTime} seconds for round to finish... `)}`);
 
     await delay(this.waitTime * 1000);
 
-    const report = await this.ApiReportScore(getScoreForZone(zone));
+    const report = await this.ApiReportScore(getScoreForZone(zoneInfo));
 
     if (report.new_score) {
       const earnedXp = report.new_score - report.old_score;
@@ -692,20 +703,20 @@ class SalienScript {
       currentLevelMsg += ` => ${chalk.green(report.new_score.toLocaleString())} XP)`;
       currentLevelMsg += ` - Current Level: ${chalk.green(report.new_level)} (${nextLevelPercent}% to next)`;
 
-      logger(this.name, currentLevelMsg);
+      logger(this.name, this.logs, 0, currentLevelMsg);
 
       const remainingXp = report.next_level_score - report.new_score;
 
       const timeRemaining =
-        ((report.next_level_score - report.new_score) / getScoreForZone(zone)) * (this.waitTime / 60);
+        ((report.next_level_score - report.new_score) / getScoreForZone(zoneInfo)) * (this.waitTime / 60);
       const hoursRemaining = Math.floor(timeRemaining / 60);
-      const minutesRemaining = timeRemaining % 60;
+      const minutesRemaining = Math.round(timeRemaining % 60);
       const levelEta = `${hoursRemaining}h ${minutesRemaining}m`;
 
       let nextLevelMsg = `>> Next Level: ${chalk.yellow(report.next_level_score.toLocaleString())} XP`;
       nextLevelMsg += ` - Remaining: ${chalk.yellow(remainingXp.toLocaleString())} XP - ETA: ${chalk.green(levelEta)}`;
 
-      logger(this.name, nextLevelMsg);
+      logger(this.name, this.logs, 0, nextLevelMsg);
     }
 
     // Some users get stuck in games after calling ReportScore, so we manually leave to fix this
@@ -730,9 +741,11 @@ class SalienScript {
     this.skippedPlanets = [];
 
     try {
-      logger(this.name, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}`);
+      logger(this.name, this.logs, 1, `   ${chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `)}`);
       logger(
         this.name,
+        this.logs,
+        1,
         `   ${chalk.bgCyan(` If you appreciate the script, please remember to leave a ⭐ star ⭐ on the project! `)}`,
       );
 
@@ -743,13 +756,13 @@ class SalienScript {
         await this.gameLoop();
       }
     } catch (e) {
-      logger(this.name, `   ${chalk.bgRed(`${e.name}:`)} ${chalk.red(e.message)}`);
+      logger(this.name, this.logs, 1, `   ${chalk.bgRed(`${e.name}:`)} ${chalk.red(e.message)}`);
 
       if (e.name !== 'SalienScriptRestart') {
         debug(e);
       }
 
-      logger(this.name, `   ${chalk.bgMagenta(` Script will restart in ${this.defaultDelaySec} seconds... `)}\n\n`);
+      logger(this.name, this.logs, 1, `   ${chalk.bgMagenta(` Script will restart in ${this.defaultDelaySec} seconds... `)}\n\n`);
 
       await delay(this.defaultDelayMs);
 
