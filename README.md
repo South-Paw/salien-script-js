@@ -119,7 +119,7 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 1. Click the button above.
-2. Set SALIEN_CONFIG_V2 (see note below).
+2. Set SALIEN_CONFIG_V2 ([see note below](#heroku-configuration)).
 3. That's all!
 
 ### Deploying with Heroku CLI
@@ -137,22 +137,39 @@ $ heroku ps:scale web=0 salien=1
 
 `SALIEN_CONFIG_V2` is just an array of config that will be passed to `SalienScript` constructor.
 
-For example:
+For example, if you have two accounts, 
+one with token `123` representing group with id `12345` that should appear in logs by name `first_acc`, 
+and another with token `456` representing group with id `67890` that should appear in logs by name `second_acc`, 
+then your config would look like:
 
 ```JSON
 [
     {
-        "token": "token1",
-        "clan": "clan1",
-        "name": "name1"
+        "token": "123",
+        "clan": "12345",
+        "name": "first_acc"
     },
     {
-        "token": "token2",
-        "clan": "clan2",
-        "name": "name2"
+        "token": "456",
+        "clan": "67890",
+        "name": "second_acc"
     }
 ]
 ```
+
+If you have only one account, then this config should be enough:
+
+```JSON
+[
+    {
+        "token": "123",
+        "clan": "12345",
+        "name": "first_acc"
+    }
+]
+```
+
+You can also remove `clan` and `name` keys or add `selectedPlanetId` key. The only mandatory key for each account is `token`.
 
 ### Updating
 
