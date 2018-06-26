@@ -46,11 +46,7 @@ const logger = (name, maxlogginlevel, loginglevel, ...messages) => {
 // eslint-disable-next-line no-console
 const debug = message => console.log(`${JSON.stringify(message, 0, 2)}`);
 
-const asyncForEach = async (_this, array, callback) => {
-  for (let index = 0; index < array.length; index += 1) {
-    await callback(array[index], index, array, _this);
-  }
-};
+const getPercentage = number => Number(number * 100).toFixed(2);
 
 const getDifficultyName = zone => {
   const boss = zone.type === 4 ? 'BOSS - ' : '';
@@ -87,6 +83,12 @@ const getScoreForZone = zone => {
 
   return score * 120;
 };
+
+const formatPlanetName = name =>
+  name
+    .replace('#TerritoryControl_Planet', '')
+    .split('_')
+    .join(' ');
 
 const updateCheck = async name => {
   let hasUpdate = null;
@@ -460,10 +462,21 @@ class SalienScript {
       throw new SalienScriptException("Didn't find any planets.");
     }
 
-    try {
-      await asyncForEach(this, planets, async (planet, index, array, _this) => {
-        let zones;
+    logger(this.name, '   Getting first available planet...');
 
+    try {
+      // Patch the apiGetPlanets response with zones from apiGetPlanet
+      const mappedPlanets = await Promise.all(
+        planets.map(async planet => {
+          const object = Object.assign({}, planet);
+
+          const currentPlanet = await this.ApiGetPlanet(planet.id);
+          object.zones = currentPlanet.zones;
+          return object;
+        }),
+      );
+
+      mappedPlanets.forEach(planet => {
         let hardZones = 0;
         let mediumZones = 0;
         let easyZones = 0;
@@ -471,11 +484,8 @@ class SalienScript {
 
         let hasBossZone = false;
 
-        while (!zones) {
-          zones = await _this.ApiGetPlanet(planet.id);
-        }
-
-        zones.zones.forEach(zone => {
+        // Filter out captured zones + determine zone types
+        planet.zones.forEach(zone => {
           if ((zone.capture_progress && zone.capture_progress > 0.97) || zone.captured) {
             return;
           }
@@ -502,10 +512,7 @@ class SalienScript {
           }
         });
 
-        _this.knownPlanetIds.push(planet.id);
-
-        // eslint-disable-next-line no-param-reassign
-        _this.knownPlanets[planet.id] = {
+        this.knownPlanets[planet.id] = {
           hardZones,
           mediumZones,
           easyZones,
@@ -514,14 +521,11 @@ class SalienScript {
           ...planet,
         };
 
-        const capturedPercent = Number(planet.state.capture_progress * 100)
-          .toFixed(2)
-          .toString();
+        this.knownPlanetIds.push(planet.id);
 
-        const planetName = planet.state.name
-          .replace('#TerritoryControl_', '')
-          .split('_')
-          .join(' ');
+        const capturedPercent = getPercentage(planet.state.capture_progress).toString();
+
+        const planetName = formatPlanetName(planet.state.name);
 
         let logMsg = `>> Planet: ${chalk.green(planet.id)}`;
         logMsg += ` - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)}`;
@@ -536,15 +540,18 @@ class SalienScript {
         }
 
         if (hasBossZone) {
-          // eslint-disable-next-line no-param-reassign
-          _this.currentPlanetId = planet.id;
-
-          throw new SalienScriptException('Boss zone found!');
+          logger(this.name, chalk.green('>> This planet has a boss zone, selecting this planet'));
+          this.currentPlanetId = planet.id;
         }
       });
     } catch (e) {
       if (e.name === 'SalienScriptException' && e.message === 'Boss zone found!') {
-        logger(this.name, this.logs, 2, chalk.green('>> This planet has a boss zone, selecting this planet'));
+        logger(
+          this.name,
+          this.logs,
+          1,
+          chalk.green(`>> Planet ${chalk.yellow(this.currentPlanetId)} has a boss zone, selecting this planet`),
+        );
       } else {
         debug(e);
         throw new SalienScriptException(e.message);
@@ -579,10 +586,7 @@ class SalienScript {
           }
 
           if (!planet.state.captured && !this.currentPlanetId) {
-            const planetName = planet.state.name
-              .replace('#TerritoryControl_', '')
-              .split('_')
-              .join(' ');
+            const planetName = formatPlanetName(planet.state.name);
 
             logger(this.name, this.logs, 1, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
 
@@ -664,9 +668,7 @@ class SalienScript {
 
     const zoneInfo = zone.zone_info;
 
-    const capturedPercent = Number(planetCaptured * 100)
-      .toFixed(2)
-      .toString();
+    const capturedPercent = getPercentage(planetCaptured).toString();
 
     let planetLogMsg = `>> Planet ${chalk.green(this.currentPlanetId)} - Captured: ${chalk.yellow(capturedPercent)}%`;
     planetLogMsg += ` - Hard: ${chalk.yellow(hardZones)} - Medium: ${chalk.yellow(mediumZones)}`;
@@ -675,11 +677,7 @@ class SalienScript {
 
     logger(this.name, this.logs, 1, planetLogMsg);
 
-    const capturedProgress = !zoneInfo.capture_progress
-      ? 0
-      : Number(zoneInfo.capture_progress * 100)
-          .toFixed(2)
-          .toString();
+    const capturedProgress = !zoneInfo.capture_progress ? 0 : getPercentage(zoneInfo.capture_progress).toString();
 
     let zoneLogMsg = `>> Zone ${chalk.green(zoneInfo.zone_position)} - Captured: ${chalk.yellow(capturedProgress)}%`;
     zoneLogMsg += ` - Difficulty: ${chalk.yellow(getDifficultyName(zoneInfo))}`;
@@ -698,7 +696,7 @@ class SalienScript {
 
     if (report.new_score) {
       const earnedXp = report.new_score - report.old_score;
-      const nextLevelPercent = ((report.new_score / report.next_level_score) * 100).toFixed(2);
+      const nextLevelPercent = getPercentage(report.new_score / report.next_level_score);
 
       let currentLevelMsg = `>> XP Earned: ${chalk.green(earnedXp.toLocaleString())}`;
       currentLevelMsg += ` (${chalk.yellow(report.old_score.toLocaleString())} XP`;
