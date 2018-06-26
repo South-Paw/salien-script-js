@@ -122,6 +122,8 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 2. Set SALIEN_CONFIG_V2 ([see note below](#heroku-configuration)).
 3. That's all!
 
+To check if it works, visit logs at https://dashboard.heroku.com/apps/[YOUR_APP_NAME]/logs
+
 ### Deploying with Heroku CLI
 
 ```bash
@@ -131,6 +133,11 @@ $ heroku create [APP_NAME]
 $ heroku config:set "SALIEN_CONFIG_V2=[APP_CONFIG]"
 $ git push heroku master
 $ heroku ps:scale web=0 salien=1
+```
+
+And to check if it works:
+```bash
+$ heroku logs --tail
 ```
 
 ### Heroku configuration
