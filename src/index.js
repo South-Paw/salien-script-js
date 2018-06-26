@@ -3,6 +3,8 @@
  *
  * Copyright (c) 2018 Alex Gabites
  *
+ * https://github.com/South-Paw/salien-script-js
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -100,7 +102,23 @@ const updateCheck = async name => {
   }
 
   if (await hasUpdate) {
-    logger(name, 2, 1, `   ${chalk.bgMagenta(' UpdateCheck ')}`, `The latest version is ${hasUpdate.latest}. Please update!`);
+    logger(
+      name,
+      2,
+      1,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      `The latest version is ${chalk.bgCyan(hasUpdate.latest)}. Please update!`,
+    );
+    logger(
+      name,
+      2,
+      1,
+      `   ${chalk.bgMagenta(' UpdateCheck ')}`,
+      `To update, stop this script and run: ${chalk.bgCyan('npm i -g salien-script-js')}`,
+    );
+
+    // eslint-disable-next-line
+    console.log('');
   }
 };
 
@@ -119,13 +137,14 @@ class SalienScriptRestart {
 }
 
 class SalienScript {
-  constructor({ token, clan, name = null, logs = 2 }) {
+  constructor({ token, clan, selectedPlanetId, name = null, logs = 2 }) {
     this.token = token;
     this.clan = clan;
+    this.selectedPlanetId = selectedPlanetId;
     this.name = name;
     this.logs = logs;
 
-    this.maxRetries = 2;
+    this.maxRetries = 3;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
 
@@ -136,8 +155,8 @@ class SalienScript {
 
     this.currentPlanetId = null;
     this.steamPlanetId = null;
+    this.knownPlanets = new Map();
     this.knownPlanetIds = [];
-    this.knownPlanets = {};
     this.skippedPlanets = [];
   }
 
@@ -322,7 +341,7 @@ class SalienScript {
         this.name,
         this.logs,
         1,
-        `Leaving planet ${chalk.yellow(activePlanet)}, because we want to be on ${chalk.yellow(leaveCurrentPlanet)}`,
+        `>> Leaving planet ${chalk.yellow(activePlanet)}, because we want to be on ${chalk.yellow(leaveCurrentPlanet)}`,
       );
 
       await this.ApiLeaveGame(activePlanet);
@@ -512,16 +531,16 @@ class SalienScript {
           }
         });
 
-        this.knownPlanets[planet.id] = {
+        this.knownPlanetIds.push(planet.id);
+
+        this.knownPlanets.set(planet.id, {
           hardZones,
           mediumZones,
           easyZones,
           unknownZones,
           hasBossZone,
           ...planet,
-        };
-
-        this.knownPlanetIds.push(planet.id);
+        });
 
         const capturedPercent = getPercentage(planet.state.capture_progress).toString();
 
@@ -538,10 +557,14 @@ class SalienScript {
         if (unknownZones) {
           logger(this.name, this.logs, 2, `>> Unknown zones found: ${chalk.yellow(unknownZones)}`);
         }
+      });
 
-        if (hasBossZone) {
-          logger(this.name, chalk.green('>> This planet has a boss zone, selecting this planet'));
+      this.knownPlanetIds.forEach(id => {
+        const planet = this.knownPlanets.get(id);
+
+        if (planet.hasBossZone) {
           this.currentPlanetId = planet.id;
+          throw new SalienScriptException('Boss zone found!');
         }
       });
     } catch (e) {
@@ -562,9 +585,9 @@ class SalienScript {
     const priority = ['hardZones', 'mediumZones', 'easyZones'];
 
     if (!this.currentPlanetId) {
-      this.knownPlanetIds.sort((a, b) => {
-        const planetA = this.knownPlanets[a];
-        const planetB = this.knownPlanets[b];
+      const sortedPlanetIds = this.knownPlanetIds.sort((a, b) => {
+        const planetA = this.knownPlanets.get(a);
+        const planetB = this.knownPlanets.get(b);
 
         for (let i = 0; i < priority.length; i += 1) {
           const key = priority[i];
@@ -577,22 +600,40 @@ class SalienScript {
         return Number(planetA.id) - Number(planetB.id);
       });
 
-      for (let i = 0; i < priority.length; i += 1) {
-        this.knownPlanetIds.forEach(planetId => {
-          const planet = this.knownPlanets[planetId];
+      // Attempt to get selected planet from provided planet id
+      const selectedPlanet = this.knownPlanets.get(this.selectedPlanetId);
 
-          if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
-            return;
-          }
+      // If the selected planet is not valid, handle it
+      if (!selectedPlanet || this.skippedPlanets.includes(this.selectedPlanetId)) {
+        // Only log if a planet was selected
+        if (this.selectedPlanetId) {
+          logger(
+            this.name,
+            `>> Selected planet ${chalk.yellow(
+              this.selectedPlanetId,
+            )} not available. Selecting next available planet...`,
+          );
+        }
+        for (let i = 0; i < priority.length; i += 1) {
+          sortedPlanetIds.forEach(planetId => {
+            const planet = this.knownPlanets.get(planetId);
 
-          if (!planet.state.captured && !this.currentPlanetId) {
-            const planetName = formatPlanetName(planet.state.name);
+            if (this.skippedPlanets.includes(planetId) || !planet[priority[i]]) {
+              return;
+            }
 
-            logger(this.name, this.logs, 1, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
+            if (!planet.state.captured && !this.currentPlanetId) {
+              const planetName = formatPlanetName(planet.state.name);
 
-            this.currentPlanetId = planetId;
-          }
-        });
+              logger(this.name, this.logs, 1, `>> Selected planet ${chalk.green(planetId)} (${chalk.green(planetName)})`);
+              this.currentPlanetId = planetId;
+            }
+          });
+        }
+      } else if (!selectedPlanet.state.captured && !this.currentPlanetId) {
+        const planetName = formatPlanetName(selectedPlanet.state.name);
+        logger(this.name, `>> Selected planet ${chalk.green(this.selectedPlanetId)} (${chalk.green(planetName)})`);
+        this.currentPlanetId = this.selectedPlanetId;
       }
 
       if (!this.currentPlanetId) {
@@ -649,10 +690,7 @@ class SalienScript {
       }
     }
 
-    const planetName = zone.planetName
-      .replace('#TerritoryControl_', '')
-      .split('_')
-      .join(' ');
+    const planetName = formatPlanetName(zone.planetName);
 
     const position = zone.zone_position;
 
@@ -737,7 +775,7 @@ class SalienScript {
     // Reset all variables to default values every time init() is called
     this.currentPlanetId = null;
     this.knownPlanetIds = [];
-    this.knownPlanets = {};
+    this.knownPlanets = new Map();
     this.skippedPlanets = [];
 
     try {
