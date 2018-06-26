@@ -199,6 +199,15 @@ The easiest way to update script on heroku is to just delete your old app and cr
 
 Also, you can link your heroku app to dropbox account, download this repository as zip archive and unpack it to selected folder.
 
+#### Medium
+
+1. Fork this repo on github.
+2. In your heroku app control panel, at Deploy tab, connect your app to a forked repository and enable automatic deploys.
+3. When update comes, merge changes into your repo on github:
+    1. Create new pull request.
+    2. Select your repo's master branch as base fork, and South-Paw/salien-script-js master branch as head fork.
+    3. Click on a big green button "Merge pull request".
+
 #### Hard
 
 If you created your app using web-console, you need to clone heroku repo first
