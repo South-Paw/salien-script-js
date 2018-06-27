@@ -124,7 +124,7 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 
 To check if it works, visit logs at https://dashboard.heroku.com/apps/[YOUR_APP_NAME]/logs
 
-"Application error" on web page of your app is fine - it is not related to salien dyno.
+If you see "Application Error" when going to the webpage of your app, it's okay - the script will still run anyway.
 
 ### Deploying with Heroku CLI
 
@@ -197,7 +197,9 @@ then you would make your config look like this:
 
 The easiest way to update script on heroku is to just delete your old app and create new.
 
-Also, you can link your heroku app to dropbox account, download this repository as zip archive and unpack it to selected folder.
+You can also link your Heroku app to your Dropbox account. To do that, [download this repository](https://github.com/South-Paw/salien-script-js/archive/master.zip) as a zip archive, and unpack it to the folder created on your Dropbox.
+
+For more info on this, visit: https://devcenter.heroku.com/articles/dropbox-sync
 
 #### Medium
 
@@ -207,6 +209,8 @@ Also, you can link your heroku app to dropbox account, download this repository 
     1. Create new pull request.
     2. Select your repo's master branch as base fork, and South-Paw/salien-script-js master branch as head fork.
     3. Click on a big green button "Merge pull request".
+
+For more info on this, visit: https://devcenter.heroku.com/articles/github-integration
 
 #### Hard
 
