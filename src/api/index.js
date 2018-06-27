@@ -7,7 +7,15 @@ const { SalienScriptException } = require('../exceptions');
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 3000;
 
-const doFetch = async (method, params, requestOptions = {}, logger, maxRetries, retryDelayMs) => {
+const doFetch = async (
+  method,
+  params,
+  requestOptions = {},
+  logger,
+  isSilentRequest,
+  maxRetries = MAX_RETRIES,
+  retryDelayMs = RETRY_DELAY_MS,
+) => {
   let url = `https://community.steam-api.com/${method}`;
 
   if (params) {
@@ -37,23 +45,19 @@ const doFetch = async (method, params, requestOptions = {}, logger, maxRetries, 
 
   while (!response && attempts < maxRetries) {
     try {
-      if (logger) {
+      if (!isSilentRequest) {
         logger(chalk.blue(`Sending ${method}...`));
       }
 
       request = await fetch(url, options);
       response = await request.json();
     } catch (e) {
-      if (logger) {
-        logger(`${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`, e);
-      }
+      logger(`${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`, e);
 
       attempts += 1;
 
       if (attempts < maxRetries) {
-        if (logger) {
-          logger(`Retrying ${method} in ${retryDelayMs / 1000} seconds...`);
-        }
+        logger(`Retrying ${method} in ${retryDelayMs / 1000} seconds...`);
       } else {
         throw new SalienScriptException(`Failed to send ${method} after ${attempts} attempts`);
       }
@@ -65,82 +69,82 @@ const doFetch = async (method, params, requestOptions = {}, logger, maxRetries, 
   return response.response;
 };
 
-const getPlayerInfo = async (token, logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const getPlayerInfo = async (token, logger, silent) => {
   const method = 'ITerritoryControlMinigameService/GetPlayerInfo/v0001';
   const params = [`access_token=${token}`];
   const options = { method: 'POST' };
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response;
 };
 
-const getPlanets = async (logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const getPlanets = async (logger, silent) => {
   const method = 'ITerritoryControlMinigameService/GetPlanets/v0001';
   const params = ['active_only=1'];
   const options = {};
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response.planets;
 };
 
-const getPlanet = async (planetId, logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const getPlanet = async (planetId, logger, silent) => {
   const method = 'ITerritoryControlMinigameService/GetPlanet/v0001';
   const params = [`id=${planetId}`, `language=english`];
   const options = {};
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response.planets[0];
 };
 
-const representClan = async (token, clanId, logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const representClan = async (token, clanId, logger, silent) => {
   const method = 'ITerritoryControlMinigameService/RepresentClan/v0001';
   const params = [`access_token=${token}`, `clanid=${clanId}`];
   const options = { method: 'POST' };
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response;
 };
 
-const leaveGame = async (token, gameId, logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const leaveGame = async (token, gameId, logger, silent) => {
   const method = 'IMiniGameService/LeaveGame/v0001';
   const params = [`access_token=${token}`, `gameid=${gameId}`];
   const options = { method: 'POST' };
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response;
 };
 
-const joinPlanet = async (token, planetId, logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const joinPlanet = async (token, planetId, logger, silent) => {
   const method = 'ITerritoryControlMinigameService/JoinPlanet/v0001';
   const params = [`access_token=${token}`, `id=${planetId}`];
   const options = { method: 'POST' };
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response;
 };
 
-const joinZone = async (token, zoneId, logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const joinZone = async (token, zoneId, logger, silent) => {
   const method = 'ITerritoryControlMinigameService/JoinZone/v0001';
   const params = [`access_token=${token}`, `zone_position=${zoneId}`];
   const options = { method: 'POST' };
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response;
 };
 
-const reportScore = async (token, score, logger = null, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+const reportScore = async (token, score, logger, silent) => {
   const method = 'ITerritoryControlMinigameService/ReportScore/v0001';
   const params = [`access_token=${token}`, `score=${score}`, `language=english`];
   const options = { method: 'POST' };
 
-  const response = await doFetch(method, params, options, logger, maxRetries, retryDelayMs);
+  const response = await doFetch(method, params, options, logger, silent);
 
   return response;
 };

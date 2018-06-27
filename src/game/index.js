@@ -43,7 +43,7 @@ const getScoreForZone = ({ difficulty }) => {
   return score * 120;
 };
 
-const getAllPlanetStates = async (planets, completionCutoff, logger) => {
+const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentRequest) => {
   if (!planets) {
     throw new SalienScriptException('No planets provided.');
   }
@@ -62,7 +62,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger) => {
       planets.map(async planet => {
         const object = { ...planet };
 
-        const currentPlanet = await getPlanet(planet.id, logger);
+        const currentPlanet = await getPlanet(planet.id, logger, isSilentRequest);
 
         object.zones = currentPlanet.zones;
 

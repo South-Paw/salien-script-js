@@ -17,12 +17,13 @@ const { getPercentage, updateCheck, utilLogger } = require('./util');
 const pkg = require('../package.json');
 
 class SalienScript {
-  constructor({ token, clan, name = null }) {
+  constructor({ token, clan, name = null, silentRequests = true }) {
     // user defined variables
     this.token = token;
     this.clanId = clan;
     this.cutoff = 0.99;
     this.name = name;
+    this.isSilentRequest = silentRequests;
 
     // script variables
     this.startTime = null;
@@ -50,35 +51,35 @@ class SalienScript {
   }
 
   async apiGetPlayerInfo() {
-    return getPlayerInfo(this.token, (m, e) => this.logger(m, e));
+    return getPlayerInfo(this.token, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiGetPlanets() {
-    return getPlanets((m, e) => this.logger(m, e));
+    return getPlanets((m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiGetPlanet(planetId) {
-    return getPlanet(planetId, (m, e) => this.logger(m, e));
+    return getPlanet(planetId, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiRepresentClan(clanId) {
-    return representClan(this.token, clanId, (m, e) => this.logger(m, e));
+    return representClan(this.token, clanId, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiLeaveGame(gameId) {
-    return leaveGame(this.token, gameId, (m, e) => this.logger(m, e));
+    return leaveGame(this.token, gameId, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiJoinPlanet(planetId) {
-    return joinPlanet(this.token, planetId, (m, e) => this.logger(m, e));
+    return joinPlanet(this.token, planetId, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiJoinZone(zoneId) {
-    return joinZone(this.token, zoneId, (m, e) => this.logger(m, e));
+    return joinZone(this.token, zoneId, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiReportScore(score) {
-    return reportScore(this.token, score, (m, e) => this.logger(m, e));
+    return reportScore(this.token, score, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async leaveCurrentGame(requestedPlanetId = 0) {
@@ -114,7 +115,13 @@ class SalienScript {
   async doGameSetup() {
     const planets = await this.apiGetPlanets();
 
-    this.knownPlanets = await getAllPlanetStates(planets, this.cutoff, (m, e) => this.logger(m, e));
+    this.knownPlanets = await getAllPlanetStates(
+      planets,
+      this.cutoff,
+      (m, e) => this.logger(m, e),
+      this.isSilentRequest,
+    );
+
     this.currentPlanetAndZone = await getBestPlanetAndZone(this.knownPlanets, (m, e) => this.logger(m, e));
 
     const zoneCapturePercent = getPercentage(this.currentPlanetAndZone.bestZone.capture_progress);
