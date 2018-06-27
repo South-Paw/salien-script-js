@@ -11,7 +11,7 @@ const formatPlanetName = name =>
     .join(' ');
 
 const getZoneDifficultyName = ({ type, difficulty }) => {
-  const boss = type === 4 ? 'BOOS - ' : '';
+  const boss = type === 4 ? 'BOSS - ' : '';
   let name = '';
 
   switch (difficulty) {
