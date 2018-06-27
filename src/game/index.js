@@ -134,7 +134,9 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         ...planet,
       });
 
-      logger(`[DEBUG] known planet: ${planet.id}`);
+      if (planet.id === 25) logger(`[DEBUG] planet 25 found:\n${planet}`);
+
+      // logger(`[DEBUG] known planet: ${planet.id}`);
 
       const planetName = formatPlanetName(planet.state.name);
       const planetCapturePercent = getPercentage(planet.state.capture_progress);
