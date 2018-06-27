@@ -70,7 +70,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
     );
 
     mappedPlanets.forEach(planet => {
-      if (planet.id === 25) logger(`[DEBUGX] planet 25 iterated over`);
+      logger(`[DEBUGX] here, planetid: ${planet.id}`);
       let numHardZones = 0;
       let numMediumZones = 0;
       let numEasyZones = 0;
