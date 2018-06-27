@@ -6,6 +6,6 @@ COPY . /app
 
 RUN npm install
 
-ENTRYPOINT ["node", "cli.js"]
+ENTRYPOINT ["node", "bin/cli.js"]
 
 CMD ["--help"]
