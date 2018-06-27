@@ -170,13 +170,13 @@ class SalienScript {
 
     const selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
 
-    if(selectedPlanet) {
+    if (selectedPlanet) {
       this.currentPlanetAndZone = await getBestPlanetAndZone(
         this.knownPlanets,
         (m, e) => this.logger(m, e),
         this.isSilentRequest,
-        this.selectedPlanetId
-      )
+        this.selectedPlanetId,
+      );
     } else {
       this.currentPlanetAndZone = await getBestPlanetAndZone(this.knownPlanets, (m, e) => this.logger(m, e));
     }
