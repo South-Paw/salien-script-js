@@ -210,7 +210,9 @@ For more info on this, visit: https://devcenter.heroku.com/articles/dropbox-sync
     2. Select your repo's master branch as base fork, and South-Paw/salien-script-js master branch as head fork.
     3. Click on a big green button "Merge pull request".
 
-For more info on this, visit: https://devcenter.heroku.com/articles/github-integration
+For more info on connecting github account, visit: https://devcenter.heroku.com/articles/github-integration
+
+For more info on syncing fork using web interface, check this tutorial: https://www.sitepoint.com/quick-tip-sync-your-fork-with-the-original-without-the-cli/
 
 #### Hard
 
