@@ -112,7 +112,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         cleanZones = bossZones;
       }
 
-      // sort the clean zones by most difficult
+      // sort the clean zones by most difficult and then by capture progress
       cleanZones.sort((a, b) => {
         if (b.difficulty === a.difficulty) {
           if (a.capture_progress * 100 !== b.capture_progress * 100) {
