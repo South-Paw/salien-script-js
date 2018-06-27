@@ -168,7 +168,7 @@ class SalienScript {
       this.isSilentRequest,
     );
 
-    const selectedPlanet = await apiGetPlanet(this.selectedPlanetId);
+    const selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
 
     if(selectedPlanet) {
       this.currentPlanetAndZone = await getBestPlanetAndZone(
