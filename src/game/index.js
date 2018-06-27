@@ -44,15 +44,15 @@ const getScoreForZone = ({ difficulty }) => {
 };
 
 const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentRequest) => {
-  logger(`[DEBUG] Planets: ${planets}`);
   if (!planets) {
     throw new SalienScriptException('No planets provided.');
   }
-
+  
   if (!completionCutoff) {
     throw new SalienScriptException('No completion cut-off percent given.');
   }
-
+  
+  logger(`[DEBUG1] Planets: ${JSON.stringify(planets)}`);
   logger(`Scanning all planets for next best zone...`);
 
   const knownPlanets = new Map();
@@ -70,6 +70,8 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         return object;
       }),
     );
+
+    logger(`[DEBUG2] Planets: ${JSON.stringify(planets)}`);
 
     mappedPlanets.forEach(planet => {
       let numHardZones = 0;
@@ -154,6 +156,8 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
 
       logger(planetInfo);
     });
+
+    logger(`[DEBUG3] Planets: ${JSON.stringify(planets)}`);
   } catch (e) {
     throw e;
   }
