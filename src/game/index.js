@@ -135,7 +135,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
       });
 
       logger(`[DEBUG] type of planet id: ${typeof planet.id}`);
-      if (planet.id === 25) logger(`[DEBUG] planet 25 found:\n${planet}`);
+      if (planet.id === '25') logger(`[DEBUG] planet 25 found:\n${planet}`);
 
       // logger(`[DEBUG] known planet: ${planet.id}`);
 
