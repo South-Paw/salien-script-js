@@ -126,7 +126,7 @@ class SalienScript {
 
     if (requestedPlanetId > 0 && requestedPlanetId !== activePlanet) {
       let message = `>> Leaving planet ${chalk.yellow(activePlanet)}, because`;
-      message += `we want to be on ${chalk.yellow(requestedPlanetId)}`;
+      message += ` we want to be on ${chalk.yellow(requestedPlanetId)}`;
 
       this.logger(message);
 
