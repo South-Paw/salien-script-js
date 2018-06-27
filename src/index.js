@@ -43,10 +43,11 @@ const { getPercentage, updateCheck, utilLogger } = require('./util');
 const pkg = require('../package.json');
 
 class SalienScript {
-  constructor({ token, clan, name = null, logRequests = false }) {
+  constructor({ token, clan, selectedPlanetId = null, name = null, logRequests = false }) {
     // user defined variables
     this.token = token;
     this.clanId = clan;
+    this.selectedPlanetId = selectedPlanetId;
     this.name = name;
     this.isSilentRequest = !logRequests;
 
@@ -167,7 +168,18 @@ class SalienScript {
       this.isSilentRequest,
     );
 
-    this.currentPlanetAndZone = await getBestPlanetAndZone(this.knownPlanets, (m, e) => this.logger(m, e));
+    const selectedPlanet = await apiGetPlanet(this.selectedPlanetId);
+
+    if(selectedPlanet) {
+      this.currentPlanetAndZone = await getBestPlanetAndZone(
+        this.knownPlanets,
+        (m, e) => this.logger(m, e),
+        this.isSilentRequest,
+        selectedPlanetId
+      )
+    } else {
+      this.currentPlanetAndZone = await getBestPlanetAndZone(this.knownPlanets, (m, e) => this.logger(m, e));
+    }
 
     const zoneCapturePercent = getPercentage(this.currentPlanetAndZone.bestZone.capture_progress);
 
