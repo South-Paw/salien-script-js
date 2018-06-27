@@ -52,7 +52,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger) => {
     throw new SalienScriptException('No completion cut-off percent given.');
   }
 
-  logger('Getting first available planet...');
+  logger('Scanning all planets for best zone...');
 
   const knownPlanets = new Map();
 
@@ -140,7 +140,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger) => {
       const planetCurrentPlayers = planet.state.current_players.toLocaleString();
 
       let planetInfo = `>> Planet ${chalk.green(`${planet.id}`.padStart(3))}`;
-      planetInfo += ` (Captured: ${chalk.green(`${planetCapturePercent}%`.padStart(6))})`;
+      planetInfo += ` (Captured: ${chalk.yellow(`${planetCapturePercent}%`.padStart(6))})`;
       planetInfo += ` - Hard: ${chalk.yellow(`${numHardZones}`.padStart(2))}`;
       planetInfo += ` - Medium: ${chalk.yellow(`${numMediumZones}`.padStart(2))}`;
       planetInfo += ` - Easy: ${chalk.yellow(`${numEasyZones}`.padStart(2))}`;
