@@ -197,6 +197,7 @@ const getBestPlanetAndZone = async (planets, logger, cutoff, isSilentRequest, se
   });
 
   if (!foundBoss && selectedPlanetId) {
+    logger(`[DEBUG] seletedPlanetId: ${selectedPlanetId}`);
     const userSelectedPlanet = getPlanet(selectedPlanetId, logger, tempIsSilentRequest);
     const userSelectedPlanets = [];
     userSelectedPlanets.push(userSelectedPlanet);

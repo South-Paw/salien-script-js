@@ -171,7 +171,6 @@ class SalienScript {
     let selectedPlanet = null;
     if (this.selectedPlanetId) selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
     if (selectedPlanet) {
-      this.logger(`[DEBUG] Selected Planet:\n${JSON.stringify(selectedPlanet)}`);
       this.currentPlanetAndZone = await getBestPlanetAndZone(
         this.knownPlanets,
         (m, e) => this.logger(m, e),
