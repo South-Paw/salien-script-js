@@ -70,7 +70,6 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
     );
 
     mappedPlanets.forEach(planet => {
-      logger(`[DEBUGX] here, planetid: ${planet.id}`);
       let numHardZones = 0;
       let numMediumZones = 0;
       let numEasyZones = 0;
@@ -157,6 +156,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
     throw e;
   }
 
+  logger(`[DEBUG] HERE`);
   return knownPlanets;
 };
 
