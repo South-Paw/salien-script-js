@@ -202,7 +202,7 @@ const getBestPlanetAndZone = async (planets, logger, cutoff, isSilentRequest, se
 
     logger(`[DEBUG1] seletedPlanetId: ${selectedPlanetId}`);
     const userKnownPlanets = await getAllPlanetStates(userSelectedPlanets, tempCutoff, logger, tempIsSilentRequest);
-
+    logger(`[DEBUG3] userKnownPlanets: ${JSON.stringify(userKnownPlanets)}`);
     return getBestPlanetAndZone(userKnownPlanets, logger);
   }
 
