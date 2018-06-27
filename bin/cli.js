@@ -30,13 +30,10 @@ const cli = meow(
       salien-script-js [options]
 
     Options:
-      --token, -t          Your Saliens game token.
-
-      --group, -g          (Optional) The ID of a steam group you'd like to represent.
-
-      --name, -n           (Optional) The name to display on this instance of the script.
-
-      --logRequests -l     (Optional) Set to true if you'd like to show Steam API requests in the logs.
+      --token, -t           Your Saliens game token.
+      --group, -g           (Optional) The ID of a steam group you'd like to represent.
+      --name, -n            (Optional) The name to display on this instance of the script.
+      --logRequests, -l     (Optional) Set to true if you'd like to show Steam API requests in the logs.
 `,
   cliOptions,
 );

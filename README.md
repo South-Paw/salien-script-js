@@ -26,11 +26,11 @@
 
 * 👀 [Name your running scripts](#-multiple-tokensscripts)
 
-* 📦 [npm package export](#advanced--usage-as-an-npm-package)
+* ☁️ [Heroku support](#advanced-️-deploying-to-heroku)
 
 * 🐳 [Docker support](#advanced--running-as-a-docker-container)
 
-* ☁️ [Heroku support](#advanced-️-deploying-to-heroku)
+* 📦 [npm package export](#advanced--usage-as-an-npm-package)
 
 > Note: We'll try our best to keep this version up to date with the PHP and other versions! Suggestions welcome.
 
@@ -45,7 +45,7 @@
 5. Run `npm install -g salien-script-js` to install this project.
 6. Run the script by typing `salien-script-js --token xxxxxxxx` where `xxxxxxxx` is your token from step 3.
 
-> ### If you appreciate the script, please leave a star ⭐ on the project!
+> ### Remeber to drop us a ⭐ star on the project if you appreciate this script!
 
 ## 😍 How to update the script
 
@@ -81,6 +81,19 @@ If you'd like to team up with an established larger group please consider using 
 Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy --name "name of this script"` where `yyyyyyyy` is your other accounts token and `name of this script` if what you'd like to see in the log outputs.
 
 ---
+
+### Advanced: CLI Arguments
+
+```
+  Usage:
+    salien-script-js [options]
+
+  Options:
+    --token, -t           Your Saliens game token.
+    --group, -g           (Optional) The ID of a steam group you'd like to represent.
+    --name, -n            (Optional) The name to display on this instance of the script.
+    --logRequests, -l     (Optional) Set to true if you'd like to show Steam API requests in the logs.
+```
 
 ## Advanced: 📦 Usage as an npm package
 
