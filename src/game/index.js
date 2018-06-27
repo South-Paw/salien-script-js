@@ -52,7 +52,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
     throw new SalienScriptException('No completion cut-off percent given.');
   }
 
-  logger('Scanning all planets for best zone...');
+  logger(`Scanning all planets for next best zone...`);
 
   const knownPlanets = new Map();
 

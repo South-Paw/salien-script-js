@@ -145,12 +145,14 @@ class SalienScript {
 
     const zoneCapturePercent = getPercentage(this.currentPlanetAndZone.bestZone.capture_progress);
 
-    let zoneMsg = `>> Selected Zone ${chalk.green(`${this.currentPlanetAndZone.bestZone.zone_position}`.padStart(3))}`;
-    zoneMsg += ` on Planet ${chalk.green(`${this.currentPlanetAndZone.id}`.padStart(3))}`;
+    let zoneMsg = `>> Selected Next Zone ${chalk.green(this.currentPlanetAndZone.bestZone.zone_position)}`;
+    zoneMsg += ` on Planet ${chalk.green(this.currentPlanetAndZone.id)}`;
     zoneMsg += ` (Captured: ${chalk.yellow(`${zoneCapturePercent}%`.padStart(6))}`;
     zoneMsg += ` - Difficulty: ${chalk.yellow(getZoneDifficultyName(this.currentPlanetAndZone.bestZone))})`;
 
     this.logger(zoneMsg);
+
+    console.log(''); // eslint-disable-line no-console
   }
 
   async doGameLoop() {
@@ -189,13 +191,16 @@ class SalienScript {
     console.log(''); // eslint-disable-line no-console
     this.logger(`${chalk.bgMagenta(` Waiting ${this.gameWaitTimeSec} seconds for round to finish... `)}`);
 
-    // TODO at about 100 out of 110 seconds we need to call for planets which will set the this variables
-    // and then the loop will kick off with the next best fresh zone every time...
+    // 10 seconds before the score is reported, get the next planet and zone we should focus on.
+    setTimeout(async () => {
+      await this.doGameSetup();
+    }, (this.gameWaitTimeSec - 10) * 1000);
 
     await delay(this.gameWaitTimeSec * 1000);
 
     const score = await this.apiReportScore(getScoreForZone(zoneInfo));
 
+    // cause the game's api returns some numbers as strings and others as numbers
     const oldScore = Number(score.old_score);
     const newScore = Number(score.new_score);
     const nextLevelScore = Number(score.next_level_score);
@@ -226,8 +231,6 @@ class SalienScript {
 
       this.logger(nextLevelMsg);
     }
-
-    await this.doGameSetup();
 
     const leavingGame = await this.leaveCurrentGame(this.currentPlanetAndZone.id);
 
