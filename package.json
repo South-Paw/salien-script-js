@@ -1,7 +1,7 @@
 {
   "name": "salien-script-js",
-  "version": "0.0.12",
-  "description": "An easy to install, run and update Node.js script for the Steam salien mini-game.",
+  "version": "0.0.13",
+  "description": "A easy to install, run and update Node.js script for the Steam salien mini-game.",
   "keywords": [
     "salien",
     "steam",
@@ -30,11 +30,11 @@
     }
   ],
   "files": [
-    "src",
-    "cli.js"
+    "bin",
+    "src"
   ],
   "bin": {
-    "salien-script-js": "./cli.js"
+    "salien-script-js": "./bin/cli.js"
   },
   "main": "src/index.js",
   "repository": {
@@ -44,22 +44,27 @@
   "scripts": {
     "lint": "eslint ./src",
     "prepublishOnly": "npm run lint",
-    "prettier": "prettier --write \"src/**/*.js\""
+    "prettier": "prettier --write \"src/**/*.js\"",
+    "test": "jest",
+    "test/coverage": "jest --coverage"
   },
   "dependencies": {
     "chalk": "^2.4.1",
     "dateformat": "^3.0.3",
     "delay": "^3.0.0",
-    "fetch-retry": "^1.2.1",
     "meow": "^5.0.0",
+    "node-fetch": "^2.1.2",
     "update-check": "^1.5.2"
   },
   "devDependencies": {
+    "coveralls": "^3.0.1",
     "eslint": "^5.0.0",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jest": "^21.17.0",
     "eslint-plugin-prettier": "^2.6.0",
+    "jest": "^23.1.0",
     "prettier": "^1.13.5"
   },
   "engines": {

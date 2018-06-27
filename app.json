@@ -1,19 +1,19 @@
 {
-    "name": "salien-script-js",
-    "description": "Scripting the Steam Salien Sale minigame, the proper way.",
-    "repository": "https://github.com/South-Paw/salien-script-js",
-    "env": {
-        "SALIEN_CONFIG_V2": {
-            "description": "A config JSON for salien script.",
-            "value": ""
-        }
-    },
-    "formation": {
-        "web": {
-            "quantity": 0
-        },
-        "salien": {
-            "quantity": 1
-        }
+  "name": "salien-script-js",
+  "description": "Scripting the Steam Salien Sale minigame, the proper way.",
+  "repository": "https://github.com/South-Paw/salien-script-js",
+  "env": {
+    "SALIEN_CONFIG_V2": {
+      "description": "A config JSON for salien script.",
+      "value": ""
     }
+  },
+  "formation": {
+    "web": {
+      "quantity": 0
+    },
+    "salien": {
+      "quantity": 1
+    }
+  }
 }

@@ -1,11 +1,12 @@
 # salien-script-js
 
-👽 An easy to install, run and update Node.js script for the Steam salien mini-game. 
+👽 A easy to install, run and update Node.js script for the Steam salien mini-game.
 
 > A Node.js implementation of https://github.com/SteamDatabase/SalienCheat by [xPaw](https://github.com/xPaw) with additional features!
 
 [![npm](https://img.shields.io/npm/v/salien-script-js.svg)](https://www.npmjs.com/package/salien-script-js)
 [![CI Status](https://img.shields.io/travis/South-Paw/salien-script-js.svg)](https://travis-ci.org/South-Paw/salien-script-js)
+[![Coveralls Status](https://img.shields.io/coveralls/github/South-Paw/salien-script-js.svg)](https://coveralls.io/github/South-Paw/salien-script-js)
 [![Dependencies](https://david-dm.org/South-Paw/salien-script-js.svg)](https://david-dm.org/South-Paw/salien-script-js)
 [![Dev Dependencies](https://david-dm.org/South-Paw/salien-script-js/dev-status.svg)](https://david-dm.org/South-Paw/salien-script-js?type=dev)
 
@@ -13,14 +14,23 @@
 
 ## 🌈 Features
 
-* 🎉 Easy to install, run and update
-* ✉️ Update checker and log notifications
+* 🎉 [Easy to install, run and update](#️-how-to-use-this)
+
+* ✉️ [Update checker and log notifications](#-how-to-update-the-script)
+
 * 👽 Same logic as the [PHP version](https://github.com/SteamDatabase/SalienCheat) (we almost have parity)
-* 👌 Pick your own steam group
-* 👥 Works well with multiple tokens/scripts
-* 👀 Name your running scripts
-* 🐳 Docker support
-* ☁️ Heroku support
+
+* 👌 [Pick your own steam group](#-represent-your-steam-group-optional)
+
+* 👥 [Works well with multiple tokens/scripts](#-multiple-tokensscripts)
+
+* 👀 [Name your running scripts](#-multiple-tokensscripts)
+
+* ☁️ [Heroku support](#advanced-️-deploying-to-heroku)
+
+* 🐳 [Docker support](#advanced--running-as-a-docker-container)
+
+* 📦 [npm package export](#advanced--usage-as-an-npm-package)
 
 > Note: We'll try our best to keep this version up to date with the PHP and other versions! Suggestions welcome.
 
@@ -35,7 +45,7 @@
 5. Run `npm install -g salien-script-js` to install this project.
 6. Run the script by typing `salien-script-js --token xxxxxxxx` where `xxxxxxxx` is your token from step 3.
 
-> ### If you appreciate the script, please leave a star ⭐ on the project!
+> ### Remeber to drop us a ⭐ star on the project if you appreciate this script!
 
 ## 😍 How to update the script
 
@@ -63,8 +73,8 @@ You can get your group id by going to https://steamcommunity.com/groups/YOUR_GRO
 If you'd like to team up with an established larger group please consider using either:
 
 * [/r/saliens](https://steamcommunity.com/groups/summersaliens) id: `103582791462557324`
-* [100Pals](https://steamcommunity.com/groups/100pals) id: `103582791454524084`
 * [SteamDB](https://steamcommunity.com/groups/steamdb) id: `103582791434298690`
+* [100Pals](https://steamcommunity.com/groups/100pals) id: `103582791454524084`
 
 ### 👥 Multiple tokens/scripts
 
@@ -72,10 +82,23 @@ Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy
 
 ---
 
+### Advanced: CLI Arguments
+
+```
+  Usage:
+    salien-script-js [options]
+
+  Options:
+    --token, -t           Your Saliens game token.
+    --group, -g           (Optional) The ID of a steam group you'd like to represent.
+    --name, -n            (Optional) The name to display on this instance of the script.
+    --logRequests, -l     (Optional) Set to true if you'd like to show Steam API requests in the logs.
+```
+
 ## Advanced: 📦 Usage as an npm package
 
 ```js
-const SalienScript = require('salien-script-js');
+const { SalienScript } = require('salien-script-js');
 
 const config = {
   token: '', // Your token from https://steamcommunity.com/saliengame/gettoken
