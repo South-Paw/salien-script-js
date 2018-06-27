@@ -111,8 +111,6 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         cleanZones = bossZones;
       }
 
-      logger(`[DEBUG] cleanZones: ${JSON.stringify(cleanZones)}`);
-
       // sort the clean zones by most difficult and then by capture progress
       cleanZones.sort((a, b) => {
         if (b.difficulty === a.difficulty) {
@@ -135,6 +133,8 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         bossZones,
         ...planet,
       });
+
+      logger(`[DEBUG] known planet: ${planet.id}`);
 
       const planetName = formatPlanetName(planet.state.name);
       const planetCapturePercent = getPercentage(planet.state.capture_progress);
