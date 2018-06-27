@@ -12,7 +12,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
 
-      const response = await api.getPlayerInfo(token, mockLogger, 1, 0);
+      const response = await api.getPlayerInfo(token, mockLogger, true, 1, 0);
 
       expect(response.a).toBe(1);
     });
@@ -22,7 +22,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.getPlayerInfo(token, mockLogger, 1, 0);
+        await api.getPlayerInfo(token, mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send ITerritoryControlMinigameService/GetPlayerInfo/v0001 after 1 attempts');
       }
@@ -34,7 +34,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { planets: [1, 2] } }) });
 
-      const response = await api.getPlanets(mockLogger, 1, 0);
+      const response = await api.getPlanets(mockLogger, true, 1, 0);
 
       expect(response.length).toBe(2);
     });
@@ -44,7 +44,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.getPlanets(mockLogger, 1, 0);
+        await api.getPlanets(mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send ITerritoryControlMinigameService/GetPlanets/v0001 after 1 attempts');
       }
@@ -58,7 +58,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { planets: [1] } }) });
 
-      const response = await api.getPlanet(planetId, mockLogger, 1, 0);
+      const response = await api.getPlanet(planetId, mockLogger, true, 1, 0);
 
       expect(response).toBe(1);
     });
@@ -68,7 +68,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.getPlanet(planetId, mockLogger, 1, 0);
+        await api.getPlanet(planetId, mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send ITerritoryControlMinigameService/GetPlanet/v0001 after 1 attempts');
       }
@@ -82,7 +82,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
 
-      const response = await api.representClan(token, clanId, mockLogger, 1, 0);
+      const response = await api.representClan(token, clanId, mockLogger, true, 1, 0);
 
       expect(response.a).toBe(1);
     });
@@ -92,7 +92,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.representClan(token, clanId, mockLogger, 1, 0);
+        await api.representClan(token, clanId, mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send ITerritoryControlMinigameService/RepresentClan/v0001 after 1 attempts');
       }
@@ -106,7 +106,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
 
-      const response = await api.leaveGame(token, gameId, mockLogger, 1, 0);
+      const response = await api.leaveGame(token, gameId, mockLogger, true, 1, 0);
 
       expect(response.a).toBe(1);
     });
@@ -116,7 +116,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.leaveGame(token, gameId, mockLogger, 1, 0);
+        await api.leaveGame(token, gameId, mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send IMiniGameService/LeaveGame/v0001 after 1 attempts');
       }
@@ -130,7 +130,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
 
-      const response = await api.joinPlanet(token, planetId, mockLogger, 1, 0);
+      const response = await api.joinPlanet(token, planetId, mockLogger, true, 1, 0);
 
       expect(response.a).toBe(1);
     });
@@ -140,7 +140,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.joinPlanet(token, planetId, mockLogger, 1, 0);
+        await api.joinPlanet(token, planetId, mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send ITerritoryControlMinigameService/JoinPlanet/v0001 after 1 attempts');
       }
@@ -154,7 +154,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
 
-      const response = await api.joinZone(token, zoneId, mockLogger, 1, 0);
+      const response = await api.joinZone(token, zoneId, mockLogger, true, 1, 0);
 
       expect(response.a).toBe(1);
     });
@@ -164,7 +164,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.joinZone(token, zoneId, mockLogger, 1, 0);
+        await api.joinZone(token, zoneId, mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send ITerritoryControlMinigameService/JoinZone/v0001 after 1 attempts');
       }
@@ -178,7 +178,7 @@ describe('api', () => {
       const mockLogger = jest.fn();
       fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
 
-      const response = await api.reportScore(token, score, mockLogger, 1, 0);
+      const response = await api.reportScore(token, score, mockLogger, true, 1, 0);
 
       expect(response.a).toBe(1);
     });
@@ -188,7 +188,7 @@ describe('api', () => {
       fetch.mockResolvedValue({});
 
       try {
-        await api.reportScore(token, score, mockLogger, 1, 0);
+        await api.reportScore(token, score, mockLogger, true, 1, 0);
       } catch (e) {
         expect(e.message).toBe('Failed to send ITerritoryControlMinigameService/ReportScore/v0001 after 1 attempts');
       }
