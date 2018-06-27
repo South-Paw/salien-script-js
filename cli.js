@@ -22,6 +22,10 @@ const cliOptions = {
       type: 'string',
       alias: 'n',
     },
+    logs: {
+      type: 'number',
+      alias: 'l',
+    },
   },
 };
 
@@ -35,6 +39,7 @@ const cli = meow(
       --group, -g     The ID of a steam group you'd like to represent. (optional)
       --planet, -p    Select planet to fight on. (optional)
       --name, -n      Name this instance of the script. (optional)
+      --logs, -l      The amount of logs you want, 0 for minimal, 1 for limited and 2 for all. (optional)
 `,
   cliOptions,
 );
@@ -45,7 +50,7 @@ if (cli.flags.token) {
     clan: cli.flags.group,
     selectedPlanetId: cli.flags.planet,
     name: cli.flags.name,
+    logs: cli.flags.logs,
   });
-
   salien.init();
 }
