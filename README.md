@@ -76,6 +76,18 @@ If you'd like to team up with an established larger group please consider using 
 * [SteamDB](https://steamcommunity.com/groups/steamdb) id: `103582791434298690`
 * [100Pals](https://steamcommunity.com/groups/100pals) id: `103582791454524084`
 
+---
+
+### 🌌 Select a planet (Optional)
+
+If you would like to override planet selection in favor of a particular one, provide the `--planet` CLI option with the planet ID.
+
+```sh-session
+salien-script-js --token xxxxxxxx --planet 15
+```
+
+---
+
 ### 👥 Multiple tokens/scripts
 
 Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy --name "name of this script"` where `yyyyyyyy` is your other accounts token and `name of this script` if what you'd like to see in the log outputs.
@@ -91,6 +103,7 @@ Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy
   Options:
     --token, -t           Your Saliens game token.
     --group, -g           (Optional) The ID of a steam group you'd like to represent.
+    --planet, -p          (Optional) Select planet to fight on.
     --name, -n            (Optional) The name to display on this instance of the script.
     --logRequests, -l     (Optional) Set to true if you'd like to show Steam API requests in the logs.
 ```
