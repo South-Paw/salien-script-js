@@ -160,18 +160,17 @@ class SalienScript {
 
   async doGameSetup() {
     const planets = await this.apiGetPlanets();
-    this.logger(`[DEBUG1] Planets: ${JSON.stringify(planets)}`);
+
     this.knownPlanets = await getAllPlanetStates(
       planets,
       this.cutoff,
       (m, e) => this.logger(m, e),
       this.isSilentRequest,
     );
-    this.logger(`[DEBUG2] Known Planets: ${JSON.stringify(this.knownPlanets)}`);
+
     let selectedPlanet = null;
     if (this.selectedPlanetId) selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
     if (selectedPlanet) {
-      this.logger(`[DEBUG3] Selected Planet: ${JSON.stringify(selectedPlanet)}`);
       this.currentPlanetAndZone = await getBestPlanetAndZone(
         this.knownPlanets,
         (m, e) => this.logger(m, e),
