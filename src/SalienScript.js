@@ -31,6 +31,9 @@ class SalienScript {
     this.steamThinksPlanet = null;
     this.skippedPlanets = [];
 
+    // script variables that don't get reset
+    this.clanCheckDone = false;
+
     // script defaults
     this.gameWaitTimeSec = 110;
     this.defaultDelayMs = 5000;
@@ -107,9 +110,25 @@ class SalienScript {
     return activePlanet;
   }
 
-  // TODO
   async doClanSetup() {
-    this.logger('doClanSetup - unimplemented');
+    let playerInfo = await this.apiGetPlayerInfo();
+
+    if (this.clanId && !this.clanCheckDone && playerInfo.clan_info) {
+      this.logger(`Attempting to join group id: ${chalk.yellow(this.clanId)}`);
+
+      await this.apiRepresentClan(this.clanId);
+
+      playerInfo = await this.apiGetPlayerInfo();
+
+      if (playerInfo.clan_info) {
+        this.logger(chalk.bgCyan(` Joined group: ${playerInfo.clan_info.name} `));
+        this.logger(chalk.yellow("If the name above isn't expected, check if you're actually a member of that group"));
+
+        this.clanCheckDone = true;
+      }
+
+      console.log(''); // eslint-disable-line no-console
+    }
   }
 
   async doGameSetup() {
@@ -235,8 +254,6 @@ class SalienScript {
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
-        console.log(''); // eslint-disable-line no-console
-
         await updateCheck(this.name);
 
         await this.doGameLoop();

@@ -52,8 +52,7 @@ const updateCheck = async name => {
 
     utilLogger(name, { message: howToUpdate });
 
-    // eslint-disable-next-line
-    console.log('');
+    console.log(''); // eslint-disable-line no-console
   }
 };
 
