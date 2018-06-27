@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const meow = require('meow');
-const { SalienScript } = require('../src/index.js');
+const SalienScript = require('../src/index.js');
 
 const cliOptions = {
   flags: {
