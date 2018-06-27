@@ -160,6 +160,7 @@ class SalienScript {
       this.logger(`-- Top Clans:${zoneInfo.top_clans.map(({ name }) => ` ${name}`)}`);
     }
 
+    console.log(''); // eslint-disable-line no-console
     this.logger(`${chalk.bgMagenta(` Waiting ${this.gameWaitTimeSec} seconds for round to finish... `)}`);
 
     // TODO at about 100 out of 110 seconds we need to call for planets which will set the this variables
@@ -169,22 +170,35 @@ class SalienScript {
 
     const score = await this.apiReportScore(getScoreForZone(zoneInfo));
 
-    if (score.new_score) {
-      console.log(score);
+    const oldScore = Number(score.old_score);
+    const newScore = Number(score.new_score);
+    const nextLevelScore = Number(score.next_level_score);
+    const newLevel = Number(score.new_level);
 
-      /*
-      TODO...
+    if (newScore) {
+      const earnedXp = newScore - oldScore;
+      const nextLevelPercent = getPercentage(newScore / nextLevelScore);
 
-      score object:
-        {
-          old_score: '2338200',
-          old_level: 10,
-          new_score: '2340600',
-          new_level: 10,
-          next_level_score: '2400000' }
-          console.log(score);
-        }
-      */
+      console.log(''); // eslint-disable-line no-console
+
+      let currentLevelMsg = `>> Score: ${chalk.cyan(Number(newScore).toLocaleString())}`;
+      currentLevelMsg += ` (${chalk.green(`+${earnedXp.toLocaleString()}`)})`;
+      currentLevelMsg += ` - Current Level: ${chalk.green(newLevel)} (${nextLevelPercent}%)`;
+
+      this.logger(currentLevelMsg);
+
+      const remainingXp = nextLevelScore - newScore;
+
+      const timeRemaining = ((nextLevelScore - newScore) / getScoreForZone(zoneInfo)) * (this.gameWaitTimeSec / 60);
+      const hoursRemaining = Math.floor(timeRemaining / 60);
+      const minutesRemaining = Math.round(timeRemaining % 60);
+      const levelEta = `${hoursRemaining}h ${minutesRemaining === 0 ? 2 : minutesRemaining}m`;
+
+      let nextLevelMsg = `>> Next Level: ${chalk.yellow(nextLevelScore.toLocaleString())} XP`;
+      nextLevelMsg += ` - Remaining: ${chalk.yellow(remainingXp.toLocaleString())} XP`;
+      nextLevelMsg += ` - ETA: ${chalk.green(levelEta)}\n`;
+
+      this.logger(nextLevelMsg);
     }
 
     await this.doGameSetup();
