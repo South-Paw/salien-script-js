@@ -136,10 +136,10 @@ class SalienScript {
 
   async doGameLoop() {
     while (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
-      this.steamThinksPlanet = await this.leaveCurrentGame(this.currentPlanetAndZone);
+      this.steamThinksPlanet = await this.leaveCurrentGame(this.currentPlanetAndZone.id);
 
       if (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
-        this.apiJoinPlanet(this.currentPlanetAndZone.id);
+        await this.apiJoinPlanet(this.currentPlanetAndZone.id);
 
         this.steamThinksPlanet = await this.leaveCurrentGame();
       }
