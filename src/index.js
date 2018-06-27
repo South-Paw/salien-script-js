@@ -249,7 +249,7 @@ class SalienScript {
       const timeRemaining = ((nextLevelScore - newScore) / getScoreForZone(zoneInfo)) * (this.gameWaitTimeSec / 60);
       const hoursRemaining = Math.floor(timeRemaining / 60);
       const minutesRemaining = Math.round(timeRemaining % 60);
-      const levelEta = `${hoursRemaining}h ${minutesRemaining === 0 ? 2 : minutesRemaining}m`;
+      const levelEta = `${hoursRemaining}h ${hoursRemaining === 0 && minutesRemaining === 0 ? 2 : minutesRemaining}m`;
 
       let nextLevelMsg = `>> Next Level: ${chalk.yellow(nextLevelScore.toLocaleString())} XP`;
       nextLevelMsg += ` - Remaining: ${chalk.yellow(remainingXp.toLocaleString())} XP`;
