@@ -153,10 +153,10 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
       logger(planetInfo);
     });
   } catch (e) {
+    logger(`[DEBUG] HERE`);
     throw e;
   }
 
-  logger(`[DEBUG] HERE`);
   return knownPlanets;
 };
 
