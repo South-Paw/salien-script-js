@@ -149,8 +149,8 @@ class SalienScript {
 
     const zoneCapturePercent = getPercentage(zoneInfo.capture_progress);
 
-    let joinMsg = `>> Joined Zone ${chalk.green(`${zoneInfo.zone_position}`.padStart(3))}`;
-    joinMsg += ` on Planet ${chalk.green(`${this.currentPlanetAndZone.id}`.padStart(3))}`;
+    let joinMsg = `>> Joined Zone ${chalk.green(zoneInfo.zone_position)}`;
+    joinMsg += ` on Planet ${chalk.green(this.currentPlanetAndZone.id)}`;
     joinMsg += ` (Captured: ${chalk.yellow(`${zoneCapturePercent}%`.padStart(6))}`;
     joinMsg += ` - Difficulty: ${chalk.yellow(getZoneDifficultyName(this.currentPlanetAndZone.bestZone))})`;
 
@@ -213,9 +213,11 @@ class SalienScript {
   async init() {
     this.startTime = new Date().getTime();
 
+    console.log(''); // eslint-disable-line no-console
     this.logger(chalk.bgGreen(` Started SalienScript | Version: ${pkg.version} `));
     this.logger(chalk.bgCyan(' Thanks for choosing https://github.com/South-Paw/salien-script-js '));
-    this.logger(chalk.bgCyan(' Remeber to drop us a star on the project if you appreciate this script! '));
+    this.logger(chalk.bgCyan(' Remeber to drop us a ⭐ star on the project if you appreciate this script! '));
+    console.log(''); // eslint-disable-line no-console
 
     this.resetScript();
 
