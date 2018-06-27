@@ -44,6 +44,7 @@ const getScoreForZone = ({ difficulty }) => {
 };
 
 const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentRequest) => {
+  logger(`[DEBUG] Planets: ${planets}`);
   if (!planets) {
     throw new SalienScriptException('No planets provided.');
   }
