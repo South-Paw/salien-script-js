@@ -167,7 +167,7 @@ class SalienScript {
       (m, e) => this.logger(m, e),
       this.isSilentRequest,
     );
-    this.logger(`[DEBUG2] Known Planets: ${JSON.stringify(knownPlanets)}`);
+    this.logger(`[DEBUG2] Known Planets: ${JSON.stringify(this.knownPlanets)}`);
     const selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
     this.logger(`[DEBUG3] Selected Planet: ${JSON.stringify(selectedPlanet)}`);
     if (selectedPlanet) {
