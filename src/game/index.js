@@ -115,6 +115,10 @@ const getAllPlanetStates = async (planets, completionCutoff, logger) => {
       // sort the clean zones by most difficult
       cleanZones.sort((a, b) => {
         if (b.difficulty === a.difficulty) {
+          if (a.capture_progress * 100 !== b.capture_progress * 100) {
+            return a.capture_progress * 100000 - b.capture_progress * 100000;
+          }
+
           return b.zone_position - a.zone_position;
         }
 
