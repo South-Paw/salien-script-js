@@ -160,10 +160,12 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
   return knownPlanets;
 };
 
-const getBestPlanetAndZone = async (planets, logger) => {
+const getBestPlanetAndZone = async (planets, logger, cutoff, isSilentRequest, selectedPlanetId = null) => {
   const planetsWithSortKeys = [];
   let foundBoss = false;
   let selectedPlanet = null;
+  cutoff = cutoff || 0.99;
+  isSilentRequest = isSilentRequest === undefined ? true : isSilentRequest;
 
   planets.forEach(planet => {
     if (foundBoss) {
@@ -193,6 +195,21 @@ const getBestPlanetAndZone = async (planets, logger) => {
 
     planetsWithSortKeys.push({ ...planet, sortKey });
   });
+
+  if (!foundBoss && selectedPlanetId) {
+    userSelectedPlanet = getPlanet(selectedPlanetId, logger, isSilentRequest);
+    userSelectedPlanets = [];
+    userSelectedPlanets.push(userSelectedPlanet);
+
+    userKnownPlanets = await getAllPlanetStates(
+      userSelectedPlanets,
+      cutoff,
+      logger,
+      isSilentRequest
+    );
+    
+    return getBestPlanetAndZone(userKnownPlanets, logger);
+  }
 
   // early return
   if (selectedPlanet) {
