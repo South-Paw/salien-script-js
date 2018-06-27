@@ -174,6 +174,7 @@ class SalienScript {
       this.currentPlanetAndZone = await getBestPlanetAndZone(
         this.knownPlanets,
         (m, e) => this.logger(m, e),
+        this.cutoff,
         this.isSilentRequest,
         this.selectedPlanetId,
       );
