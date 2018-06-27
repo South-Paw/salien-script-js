@@ -13,13 +13,13 @@ const cliOptions = {
       type: 'string',
       alias: 'g',
     },
-    planet: {
-      type: 'string',
-      alias: 'p',
-    },
     name: {
       type: 'string',
       alias: 'n',
+    },
+    logRequests: {
+      type: 'boolean',
+      alias: 'l',
     },
   },
 };
@@ -30,11 +30,13 @@ const cli = meow(
       salien-script-js [options]
 
     Options:
-      --token, -t     Your Saliens game token.
+      --token, -t          Your Saliens game token.
 
-      --group, -g     (Optional) The ID of a steam group you'd like to represent.
+      --group, -g          (Optional) The ID of a steam group you'd like to represent.
 
-      --name, -n      (Optional) The name to display on this instance of the script.
+      --name, -n           (Optional) The name to display on this instance of the script.
+
+      --logRequests -l     (Optional) Set to true if you'd like to show Steam API requests in the logs.
 `,
   cliOptions,
 );
@@ -44,6 +46,7 @@ if (cli.flags.token) {
     token: cli.flags.token,
     clan: cli.flags.group,
     name: cli.flags.name,
+    logRequests: cli.flags.logRequests,
   });
 
   salien.init();

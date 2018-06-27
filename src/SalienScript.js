@@ -17,13 +17,12 @@ const { getPercentage, updateCheck, utilLogger } = require('./util');
 const pkg = require('../package.json');
 
 class SalienScript {
-  constructor({ token, clan, name = null, silentRequests = true }) {
+  constructor({ token, clan, name = null, logRequests = false }) {
     // user defined variables
     this.token = token;
     this.clanId = clan;
-    this.cutoff = 0.99;
     this.name = name;
-    this.isSilentRequest = silentRequests;
+    this.isSilentRequest = !logRequests;
 
     // script variables
     this.startTime = null;
@@ -36,6 +35,7 @@ class SalienScript {
     this.gameWaitTimeSec = 110;
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
+    this.cutoff = 0.99;
   }
 
   resetScript() {
