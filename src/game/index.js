@@ -63,14 +63,14 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         const object = { ...planet };
 
         const currentPlanet = await getPlanet(planet.id, logger, isSilentRequest);
-
+        logger(`[DEBUG3] Current mapped planet: ${JSON.stringify(currentPlanet)}`);
         object.zones = currentPlanet.zones;
 
         return object;
       }),
     );
 
-    logger(`[DEBUG2] Mapped Planets: ${JSON.stringify(mappedPlanets)}`);
+    // logger(`[DEBUG2] Mapped Planets: ${JSON.stringify(mappedPlanets)}`);
 
     mappedPlanets.forEach(planet => {
       let numHardZones = 0;
