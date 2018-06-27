@@ -153,7 +153,6 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
       logger(planetInfo);
     });
   } catch (e) {
-    logger(`[DEBUG] HERE`);
     throw e;
   }
 
@@ -211,8 +210,12 @@ const getBestPlanetAndZone = async (planets, logger, cutoff, isSilentRequest, se
   if (selectedPlanet) {
     return selectedPlanet;
   }
-
-  return planetsWithSortKeys.sort((a, b) => b.sortKey - a.sortKey)[0];
+  try {
+    return planetsWithSortKeys.sort((a, b) => b.sortKey - a.sortKey)[0];
+  } catch (e) {
+    logger(`[DEBUG] HERE`);
+    throw e;
+  }
 };
 
 module.exports = { getZoneDifficultyName, getScoreForZone, getAllPlanetStates, getBestPlanetAndZone };
