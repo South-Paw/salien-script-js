@@ -168,9 +168,10 @@ class SalienScript {
       this.isSilentRequest,
     );
     this.logger(`[DEBUG2] Known Planets: ${JSON.stringify(this.knownPlanets)}`);
-    const selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
-    this.logger(`[DEBUG3] Selected Planet: ${JSON.stringify(selectedPlanet)}`);
+    let selectedPlanet = null;
+    if (this.selectedPlanetId) selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
     if (selectedPlanet) {
+      this.logger(`[DEBUG3] Selected Planet: ${JSON.stringify(selectedPlanet)}`);
       this.currentPlanetAndZone = await getBestPlanetAndZone(
         this.knownPlanets,
         (m, e) => this.logger(m, e),
