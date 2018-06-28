@@ -111,7 +111,7 @@ Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy
 ## Advanced: 📦 Usage as an npm package
 
 ```js
-const { SalienScript } = require('salien-script-js');
+const SalienScript = require('salien-script-js');
 
 const config = {
   token: '', // Your token from https://steamcommunity.com/saliengame/gettoken
@@ -142,7 +142,7 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 
 ### Deploying with web-console
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/South-Paw/salien-script-js)
 
 1. Click the button above.
 2. Set SALIEN_CONFIG_V2 ([see note below](#heroku-configuration)).
