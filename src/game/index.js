@@ -198,11 +198,8 @@ const getBestPlanetAndZone = async (planets, logger) => {
   if (selectedPlanet) {
     return selectedPlanet;
   }
-  try {
-    return planetsWithSortKeys.sort((a, b) => b.sortKey - a.sortKey)[0];
-  } catch (e) {
-    throw e;
-  }
+
+  return planetsWithSortKeys.sort((a, b) => b.sortKey - a.sortKey)[0];
 };
 
 const getSelectedPlanetBestZone = async (planets, logger, selectedPlanetId) => {
