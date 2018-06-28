@@ -13,6 +13,10 @@ const cliOptions = {
       type: 'string',
       alias: 'g',
     },
+    planet: {
+      type: 'string',
+      alias: 'p',
+    },
     name: {
       type: 'string',
       alias: 'n',
@@ -32,6 +36,7 @@ const cli = meow(
     Options:
       --token, -t           Your Saliens game token.
       --group, -g           (Optional) The ID of a steam group you'd like to represent.
+      --planet, -p          (Optional) Select planet to fight on.
       --name, -n            (Optional) The name to display on this instance of the script.
       --logRequests, -l     (Optional) Set to true if you'd like to show Steam API requests in the logs.
 `,
@@ -42,6 +47,7 @@ if (cli.flags.token) {
   const salien = new SalienScript({
     token: cli.flags.token,
     clan: cli.flags.group,
+    selectedPlanetId: cli.flags.planet,
     name: cli.flags.name,
     logRequests: cli.flags.logRequests,
   });
