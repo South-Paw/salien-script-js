@@ -26,7 +26,7 @@ const doFetch = async (method, params, requestOptions = {}, logger, isSilentRequ
       Origin: 'https://steamcommunity.com',
       Referer: 'https://steamcommunity.com/saliengame/play/',
       'User-Agent':
-        'Mozilla/5.0 (compatible; salien-script-js; +https://github.com/South-Paw/salien-script-js)',
+        'salien-script-js (https://github.com/South-Paw/salien-script-js)',
     },
     ...requestOptions,
   };
