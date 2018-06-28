@@ -98,7 +98,7 @@ Simply open another PowerShell window and run `salien-script-js --token yyyyyyyy
 ## Advanced: 📦 Usage as an npm package
 
 ```js
-const { SalienScript } = require('salien-script-js');
+const SalienScript = require('salien-script-js');
 
 const config = {
   token: '', // Your token from https://steamcommunity.com/saliengame/gettoken
