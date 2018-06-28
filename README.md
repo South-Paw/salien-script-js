@@ -129,7 +129,7 @@ You can also set up continuous deployment through Docker Hub. [Read the followin
 
 ### Deploying with web-console
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/South-Paw/salien-script-js)
 
 1. Click the button above.
 2. Set SALIEN_CONFIG_V2 ([see note below](#heroku-configuration)).

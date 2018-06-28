@@ -1,11 +1,11 @@
 {
   "name": "salien-script-js",
-  "description": "Scripting the Steam Salien Sale minigame, the proper way.",
+  "description": "A easy to install, run and update Node.js script for the Steam salien mini-game.",
   "repository": "https://github.com/South-Paw/salien-script-js",
   "env": {
     "SALIEN_CONFIG_V2": {
       "description": "A config JSON for salien script.",
-      "value": ""
+      "value": "[{\"token\": \"PUT_YOUR_TOKEN_HERE\"}]"
     }
   },
   "formation": {
