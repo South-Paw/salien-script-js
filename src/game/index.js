@@ -55,14 +55,15 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
   logger(`Scanning all planets for next best zone...`);
 
   const knownPlanets = new Map();
-  
+
   try {
     // Patch the apiGetPlanets response with zones from apiGetPlanet
     const mappedPlanets = await Promise.all(
       planets.map(async planet => {
         const object = { ...planet };
-        
-        const currentPlanet = await getPlanet(planet.id, logger, false);
+
+        const currentPlanet = await getPlanet(planet.id, logger, isSilentRequest);
+
         object.zones = currentPlanet.zones;
 
         return object;
@@ -133,11 +134,11 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         bossZones,
         ...planet,
       });
-      
+
       const planetName = formatPlanetName(planet.state.name);
       const planetCapturePercent = getPercentage(planet.state.capture_progress);
       const planetCurrentPlayers = planet.state.current_players.toLocaleString();
-      
+
       let planetInfo = `>> Planet ${chalk.green(`${planet.id}`.padStart(3))}`;
       planetInfo += ` (Captured: ${chalk.yellow(`${planetCapturePercent}%`.padStart(6))})`;
       planetInfo += ` - Hard: ${chalk.yellow(`${numHardZones}`.padStart(2))}`;
@@ -146,10 +147,10 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
       planetInfo += ` - Players: ${chalk.yellow(`${planetCurrentPlayers}`.padStart(7))}`;
       planetInfo += ` (${chalk.green(planetName)})`;
       planetInfo += numUnknownZones
-      ? `\n${chalk.yellow(`!! ${`${numUnknownZones}`.padStart(2)} unknown zones found in planet`)}`
-      : '';
+        ? `\n${chalk.yellow(`!! ${`${numUnknownZones}`.padStart(2)} unknown zones found in planet`)}`
+        : '';
       planetInfo += bossZones.length > 0 ? `\n${chalk.yellow(`!! Boss zone detected`)}` : '';
-      
+
       logger(planetInfo);
     });
   } catch (e) {
@@ -204,9 +205,6 @@ const getBestPlanetAndZone = async (planets, logger) => {
   }
 };
 
-/**
- * 
- */
 const getSelectedPlanetBestZone = async (planets, logger, selectedPlanetId) => {
   let foundBoss = false;
   let selectedPlanet = null;
@@ -218,7 +216,6 @@ const getSelectedPlanetBestZone = async (planets, logger, selectedPlanetId) => {
       logger(chalk.green(`>> Planet ${planet.id} has an uncaptured boss zone, selecting it`));
       foundBoss = true;
       selectedPlanet = planet;
-      return;
     }
   });
 
@@ -227,8 +224,14 @@ const getSelectedPlanetBestZone = async (planets, logger, selectedPlanetId) => {
     userKnownPlanets.set(selectedPlanetId, planets.get(selectedPlanetId));
 
     return getBestPlanetAndZone(userKnownPlanets, logger);
-  } 
+  }
   return selectedPlanet;
-}
+};
 
-module.exports = { getZoneDifficultyName, getScoreForZone, getAllPlanetStates, getBestPlanetAndZone, getSelectedPlanetBestZone };
+module.exports = {
+  getZoneDifficultyName,
+  getScoreForZone,
+  getAllPlanetStates,
+  getBestPlanetAndZone,
+  getSelectedPlanetBestZone,
+};

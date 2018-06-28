@@ -37,7 +37,13 @@ const {
   joinZone,
   reportScore,
 } = require('./api/index');
-const { getZoneDifficultyName, getScoreForZone, getAllPlanetStates, getBestPlanetAndZone, getSelectedPlanetBestZone } = require('./game/index');
+const {
+  getZoneDifficultyName,
+  getScoreForZone,
+  getAllPlanetStates,
+  getBestPlanetAndZone,
+  getSelectedPlanetBestZone,
+} = require('./game/index');
 const { SalienScriptRestart } = require('./exceptions');
 const { getPercentage, updateCheck, utilLogger } = require('./util');
 const pkg = require('../package.json');
@@ -170,9 +176,13 @@ class SalienScript {
     );
 
     let selectedPlanet = null;
-    if (this.selectedPlanetId) selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId); 
+    if (this.selectedPlanetId) selectedPlanet = await this.apiGetPlanet(this.selectedPlanetId);
     if (selectedPlanet) {
-      this.currentPlanetAndZone = await getSelectedPlanetBestZone(this.knownPlanets, (m, e) => this.logger(m, e), this.selectedPlanetId);
+      this.currentPlanetAndZone = await getSelectedPlanetBestZone(
+        this.knownPlanets,
+        (m, e) => this.logger(m, e),
+        this.selectedPlanetId,
+      );
     } else {
       this.currentPlanetAndZone = await getBestPlanetAndZone(this.knownPlanets, (m, e) => this.logger(m, e));
     }
