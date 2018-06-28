@@ -122,7 +122,8 @@ class SalienScript {
       return 0;
     }
 
-    const activePlanet = playerInfo.active_planet;
+    const newPlayerInfo = await this.apiGetPlayerInfo();
+    const activePlanet = newPlayerInfo.active_planet;
 
     if (requestedPlanetId > 0 && requestedPlanetId !== activePlanet) {
       let message = `>> Leaving planet ${chalk.yellow(activePlanet)}, because`;
