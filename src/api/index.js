@@ -138,6 +138,16 @@ const joinZone = async (token, zoneId, logger, silent, maxRetries = MAX_RETRIES,
   return response;
 };
 
+const joinBossZone = async (token, zoneId, logger, silent, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+  const method = 'ITerritoryControlMinigameService/JoinBossZone/v0001';
+  const params = [`access_token=${token}`, `zone_position=${zoneId}`];
+  const options = { method: 'POST' };
+
+  const response = await doFetch(method, params, options, logger, silent, maxRetries, retryDelayMs);
+
+  return response;
+};
+
 const reportScore = async (token, score, logger, silent, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
   const method = 'ITerritoryControlMinigameService/ReportScore/v0001';
   const params = [`access_token=${token}`, `score=${score}`, `language=english`];
@@ -157,5 +167,6 @@ module.exports = {
   leaveGame,
   joinPlanet,
   joinZone,
+  joinBossZone,
   reportScore,
 };
