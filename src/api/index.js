@@ -39,6 +39,9 @@ const doFetch = async (method, params, requestOptions = {}, logger, isSilentRequ
 
       request = await fetch(url, options);
       response = await request.json();
+
+      // Create a unique key in the response object that we can use to get `x-eresult` from.
+      response.response.___headers = request.headers; // eslint-disable-line no-underscore-dangle
     } catch (e) {
       logger(`${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`, e);
 
@@ -144,6 +147,30 @@ const joinBossZone = async (token, zoneId, logger, silent, maxRetries = MAX_RETR
   return response;
 };
 
+const reportBossDamage = async (
+  token,
+  useHeal,
+  damageToBoss,
+  damageTaken,
+  logger,
+  silent,
+  maxRetries = MAX_RETRIES,
+  retryDelayMs = RETRY_DELAY_MS,
+) => {
+  const method = 'ITerritoryControlMinigameService/ReportBossDamage/v0001';
+  const params = [
+    `access_token=${token}`,
+    `use_heal_ability=${useHeal}`,
+    `damage_to_boss=${damageToBoss}`,
+    `damage_taken=${damageTaken}`,
+  ];
+  const options = { method: 'POST' };
+
+  const response = await doFetch(method, params, options, logger, silent, maxRetries, retryDelayMs);
+
+  return response;
+};
+
 const reportScore = async (token, score, logger, silent, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
   const method = 'ITerritoryControlMinigameService/ReportScore/v0001';
   const params = [`access_token=${token}`, `score=${score}`, `language=english`];
@@ -164,5 +191,6 @@ module.exports = {
   joinPlanet,
   joinZone,
   joinBossZone,
+  reportBossDamage,
   reportScore,
 };
