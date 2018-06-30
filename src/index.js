@@ -35,6 +35,7 @@ const {
   leaveGame,
   joinPlanet,
   joinZone,
+  joinBossZone,
   reportScore,
 } = require('./api/index');
 const { getZoneDifficultyName, getScoreForZone, getAllPlanetStates, getBestPlanetAndZone } = require('./game/index');
@@ -103,8 +104,12 @@ class SalienScript {
     return joinPlanet(this.token, planetId, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
-  async apiJoinZone(zoneId) {
-    return joinZone(this.token, zoneId, (m, e) => this.logger(m, e), this.isSilentRequest);
+  async apiJoinZone(zone) {
+    if (zone.type === 4) {
+      return joinBossZone(this.token, zone.zone_position, (m, e) => this.logger(m, e), this.isSilentRequest);
+    }
+
+    return joinZone(this.token, zone.zone_position, (m, e) => this.logger(m, e), this.isSilentRequest);
   }
 
   async apiReportScore(score) {
@@ -193,7 +198,7 @@ class SalienScript {
       }
     }
 
-    const zone = await this.apiJoinZone(this.currentPlanetAndZone.bestZone.zone_position);
+    const zone = await this.apiJoinZone(this.currentPlanetAndZone.bestZone);
 
     // rescan if we failed to join
     if (!zone.zone_info) {
