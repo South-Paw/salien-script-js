@@ -22,9 +22,6 @@ const doFetch = async (method, params, requestOptions = {}, logger, isSilentRequ
 
   const options = {
     headers: {
-      Accept: '*/*',
-      Origin: 'https://steamcommunity.com',
-      Referer: 'https://steamcommunity.com/saliengame/play/',
       'User-Agent': 'salien-script-js (https://github.com/South-Paw/salien-script-js)',
     },
     ...requestOptions,
