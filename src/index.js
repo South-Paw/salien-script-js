@@ -222,11 +222,11 @@ class SalienScript {
       const report = await this.apiReportBossDamage(useHeal, damageToBoss, damageTaken);
 
       // eslint-disable-next-line no-underscore-dangle
-      if (report.___headers.get('x-eresult') !== 1) {
+      if (report.___headers.get('x-eresult') != 1) {
         allowedBossFails -= 1;
 
         if (allowedBossFails < 1) {
-          throw new SalienScriptRestart('Boss battle had too may errors!');
+          throw new SalienScriptRestart('Boss battle had too many errors!');
         }
       }
 
@@ -258,8 +258,8 @@ class SalienScript {
       // TODO: this message could be far prettier
       let bossStatusMsg = `@@ Boss -- HP: ${Number(report.boss_status.boss_hp)}`;
       bossStatusMsg += `/${Number(report.boss_status.boss_max_hp)}`;
-      bossStatusMsg += ` - Lasers: ${report.boss_status.num_laser_uses}`;
-      bossStatusMsg += ` - Team Heals: ${report.boss_status.num_team_heals}`;
+      bossStatusMsg += ` - Lasers: ${report.num_laser_uses}`;
+      bossStatusMsg += ` - Team Heals: ${report.num_team_heals}`;
 
       this.logger(bossStatusMsg);
 
@@ -284,7 +284,7 @@ class SalienScript {
       zone = await this.apiJoinBossZone(this.currentPlanetAndZone.bestZone.zone_position);
 
       // eslint-disable-next-line no-underscore-dangle
-      if (zone.___headers.get('x-eresult') !== 1) {
+      if (zone.___headers.get('x-eresult') != 1) {
         throw new SalienScriptRestart('!! Failed to join boss zone', zone);
       }
 
