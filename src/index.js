@@ -221,7 +221,7 @@ class SalienScript {
 
       const report = await this.apiReportBossDamage(useHeal, damageToBoss, damageTaken);
 
-      // eslint-disable-next-line no-underscore-dangle
+      // eslint-disable-next-line no-underscore-dangle eqeqeq
       if (report.___headers.get('x-eresult') != 1) {
         allowedBossFails -= 1;
 
@@ -283,7 +283,7 @@ class SalienScript {
     if (this.currentPlanetAndZone.bestZone.boss_active) {
       zone = await this.apiJoinBossZone(this.currentPlanetAndZone.bestZone.zone_position);
 
-      // eslint-disable-next-line no-underscore-dangle
+      // eslint-disable-next-line no-underscore-dangle eqeqeq
       if (zone.___headers.get('x-eresult') != 1) {
         throw new SalienScriptRestart('!! Failed to join boss zone', zone);
       }
