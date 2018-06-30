@@ -80,10 +80,10 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
       const bossZones = [];
 
       planet.zones.forEach(zone => {
-        const { capture_progress: captureProgress, captured, type, difficulty } = zone;
+        const { capture_progress: captureProgress, captured, type, difficulty, gameid } = zone;
 
-        // disregard this zone if its close to being captured or already captured
-        if ((captureProgress && captureProgress > completionCutoff) || captured) {
+        // disregard this zone if there is no gameid, it's close to being captured or already captured
+        if (!gameid || (captureProgress && captureProgress > completionCutoff) || captured || captureProgress === 0) {
           return;
         }
 
