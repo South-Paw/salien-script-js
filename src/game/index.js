@@ -83,7 +83,7 @@ const getAllPlanetStates = async (planets, completionCutoff, logger, isSilentReq
         const { capture_progress: captureProgress, captured, type, difficulty } = zone;
 
         // disregard this zone if its close to being captured or already captured
-        if ((captureProgress && captureProgress > completionCutoff) || captured) {
+        if ((captureProgress && captureProgress > completionCutoff) || captured || captureProgress === 0) {
           return;
         }
 
