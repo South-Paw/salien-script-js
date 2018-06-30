@@ -22,11 +22,7 @@ const doFetch = async (method, params, requestOptions = {}, logger, isSilentRequ
 
   const options = {
     headers: {
-      Accept: '*/*',
-      Origin: 'https://steamcommunity.com',
-      Referer: 'https://steamcommunity.com/saliengame/play/',
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36',
+      'User-Agent': 'salien-script-js (https://github.com/South-Paw/salien-script-js)',
     },
     ...requestOptions,
   };
@@ -43,6 +39,9 @@ const doFetch = async (method, params, requestOptions = {}, logger, isSilentRequ
 
       request = await fetch(url, options);
       response = await request.json();
+
+      // Create a unique key in the response object that we can use to get `x-eresult` from.
+      response.response.___headers = request.headers; // eslint-disable-line no-underscore-dangle
     } catch (e) {
       logger(`${chalk.bgRed(`${e.name}:`)} ${chalk.red(`For ${method}`)}`, e);
 
@@ -138,6 +137,40 @@ const joinZone = async (token, zoneId, logger, silent, maxRetries = MAX_RETRIES,
   return response;
 };
 
+const joinBossZone = async (token, zoneId, logger, silent, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
+  const method = 'ITerritoryControlMinigameService/JoinBossZone/v0001';
+  const params = [`access_token=${token}`, `zone_position=${zoneId}`];
+  const options = { method: 'POST' };
+
+  const response = await doFetch(method, params, options, logger, silent, maxRetries, retryDelayMs);
+
+  return response;
+};
+
+const reportBossDamage = async (
+  token,
+  useHeal,
+  damageToBoss,
+  damageTaken,
+  logger,
+  silent,
+  maxRetries = MAX_RETRIES,
+  retryDelayMs = RETRY_DELAY_MS,
+) => {
+  const method = 'ITerritoryControlMinigameService/ReportBossDamage/v0001';
+  const params = [
+    `access_token=${token}`,
+    `use_heal_ability=${useHeal}`,
+    `damage_to_boss=${damageToBoss}`,
+    `damage_taken=${damageTaken}`,
+  ];
+  const options = { method: 'POST' };
+
+  const response = await doFetch(method, params, options, logger, silent, maxRetries, retryDelayMs);
+
+  return response;
+};
+
 const reportScore = async (token, score, logger, silent, maxRetries = MAX_RETRIES, retryDelayMs = RETRY_DELAY_MS) => {
   const method = 'ITerritoryControlMinigameService/ReportScore/v0001';
   const params = [`access_token=${token}`, `score=${score}`, `language=english`];
@@ -157,5 +190,7 @@ module.exports = {
   leaveGame,
   joinPlanet,
   joinZone,
+  joinBossZone,
+  reportBossDamage,
   reportScore,
 };

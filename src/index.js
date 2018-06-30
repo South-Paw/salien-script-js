@@ -35,6 +35,8 @@ const {
   leaveGame,
   joinPlanet,
   joinZone,
+  joinBossZone,
+  reportBossDamage,
   reportScore,
 } = require('./api/index');
 const {
@@ -112,6 +114,21 @@ class SalienScript {
 
   async apiJoinZone(zoneId) {
     return joinZone(this.token, zoneId, (m, e) => this.logger(m, e), this.isSilentRequest);
+  }
+
+  async apiJoinBossZone(zoneId) {
+    return joinBossZone(this.token, zoneId, (m, e) => this.logger(m, e), this.isSilentRequest);
+  }
+
+  async apiReportBossDamage(useHeal, damageToBoss, damageTaken) {
+    return reportBossDamage(
+      this.token,
+      useHeal,
+      damageToBoss,
+      damageTaken,
+      (m, e) => this.logger(m, e),
+      this.isSilentRequest,
+    );
   }
 
   async apiReportScore(score) {
@@ -199,6 +216,74 @@ class SalienScript {
     console.log(''); // eslint-disable-line no-console
   }
 
+  async playBossZone() {
+    const min = 120;
+    const max = 180;
+
+    let nextHeal = Math.floor(new Date().getTime() / 1000) + Math.floor(Math.random() * (max - min + 1) + min);
+    let allowedBossFails = 10;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      let useHeal = 0;
+      const damageToBoss = 1;
+      const damageTaken = 0;
+
+      if (Math.floor(new Date().getTime() / 1000) >= nextHeal) {
+        useHeal = 1;
+        nextHeal = Math.floor(new Date().getTime() / 1000) + 120;
+
+        this.logger('@@ Boss -- Using heal ability');
+      }
+
+      const report = await this.apiReportBossDamage(useHeal, damageToBoss, damageTaken);
+
+      // eslint-disable-next-line no-underscore-dangle
+      if (report.___headers.get('x-eresult') !== 1) {
+        allowedBossFails -= 1;
+
+        if (allowedBossFails < 1) {
+          throw new SalienScriptRestart('Boss battle had too may errors!');
+        }
+      }
+
+      if (!report.boss_status) {
+        this.logger('@@ Boss -- Waiting...');
+
+        await delay(3000);
+
+        continue; // eslint-disable-line no-continue
+      }
+
+      // TODO: support logging of boss_status and players
+      // https://github.com/SteamDatabase/SalienCheat/blob/master/cheat.php#L203
+
+      if (report.game_over) {
+        this.logger('@@ Boss -- The battle is over!');
+
+        return;
+      }
+
+      if (report.waiting_for_players) {
+        this.logger('@@ Boss -- Waiting for players...');
+
+        await delay(3000);
+
+        continue; // eslint-disable-line no-continue
+      }
+
+      // TODO: this message could be far prettier
+      let bossStatusMsg = `@@ Boss -- HP: ${Number(report.boss_status.boss_hp)}`;
+      bossStatusMsg += `/${Number(report.boss_status.boss_max_hp)}`;
+      bossStatusMsg += ` - Lasers: ${report.boss_status.num_laser_uses}`;
+      bossStatusMsg += ` - Team Heals: ${report.boss_status.num_team_heals}`;
+
+      this.logger(bossStatusMsg);
+
+      console.log(''); // eslint-disable-line no-console
+    }
+  }
+
   async doGameLoop() {
     while (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
       this.steamThinksPlanet = await this.leaveCurrentGame(this.currentPlanetAndZone.id);
@@ -210,7 +295,22 @@ class SalienScript {
       }
     }
 
-    const zone = await this.apiJoinZone(this.currentPlanetAndZone.bestZone.zone_position);
+    let zone;
+
+    if (this.currentPlanetAndZone.bestZone.boss_active) {
+      zone = await this.apiJoinBossZone(this.currentPlanetAndZone.bestZone.zone_position);
+
+      // eslint-disable-next-line no-underscore-dangle
+      if (zone.___headers.get('x-eresult') !== 1) {
+        throw new SalienScriptRestart('!! Failed to join boss zone', zone);
+      }
+
+      await this.playBossZone();
+
+      return;
+    }
+
+    zone = await this.apiJoinZone(this.currentPlanetAndZone.bestZone.zone_position);
 
     // rescan if we failed to join
     if (!zone.zone_info) {
