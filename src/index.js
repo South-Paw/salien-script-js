@@ -202,9 +202,10 @@ class SalienScript {
   async playBossZone() {
     const min = 120;
     const max = 180;
+    const defaultAllowedFailures = 10;
 
     let nextHeal = Math.floor(new Date().getTime() / 1000) + Math.floor(Math.random() * (max - min + 1) + min);
-    let allowedBossFails = 10;
+    let allowedBossFails = defaultAllowedFailures;
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -231,7 +232,7 @@ class SalienScript {
       }
 
       // if we didn't get an error, reset the allowed failure count
-      allowedBossFails = 10;
+      allowedBossFails = defaultAllowedFailures;
 
       if (!report.boss_status) {
         this.logger('@@ Boss -- Waiting...');
@@ -244,7 +245,7 @@ class SalienScript {
       if (report.boss_status.boss_players) {
         console.log(''); // eslint-disable-line no-console
 
-        // TODO: format player name so it doesn't screw up our neat output
+        // TODO: format player name better so it doesn't screw up our neat output
 
         report.boss_status.boss_players.forEach(player => {
           let scoreCard = `  ${`${player.name}`.padEnd(30)}`;
