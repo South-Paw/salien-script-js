@@ -203,6 +203,7 @@ class SalienScript {
     const min = 120;
     const max = 180;
     const defaultAllowedFailures = 10;
+    const defaultBossDelay = 5000;
 
     let nextHeal = Math.floor(new Date().getTime() / 1000) + Math.floor(Math.random() * (max - min + 1) + min);
     let allowedBossFails = defaultAllowedFailures;
@@ -237,7 +238,7 @@ class SalienScript {
       if (!report.boss_status) {
         this.logger('@@ Boss -- Waiting...');
 
-        await delay(3000);
+        await delay(defaultBossDelay);
 
         continue; // eslint-disable-line no-continue
       }
@@ -265,7 +266,7 @@ class SalienScript {
       if (report.waiting_for_players) {
         this.logger('@@ Boss -- Waiting for players...');
 
-        await delay(3000);
+        await delay(defaultBossDelay);
 
         continue; // eslint-disable-line no-continue
       }
