@@ -273,7 +273,7 @@ class SalienScript {
       bossStatusMsg += ` / ${Number(report.boss_status.boss_max_hp).toLocaleString()}`;
       bossStatusMsg += ` (${getPercentage(report.boss_status.boss_hp / report.boss_status.boss_max_hp)}%)`;
       bossStatusMsg += ` - Lasers: ${report.num_laser_uses}`;
-      bossStatusMsg += ` - Team Heals: ${report.num_team_heals}\n`;
+      bossStatusMsg += ` - Team Heals: ${report.num_team_heals}`;
 
       this.logger(bossStatusMsg);
 
