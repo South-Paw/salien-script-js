@@ -244,8 +244,6 @@ class SalienScript {
       if (report.game_over) {
         this.logger('@@ Boss -- The battle is over!');
         throw new SalienScriptRestart('Boss battle is over!');
-
-        return;
       }
 
       if (report.waiting_for_players) {
