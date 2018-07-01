@@ -308,7 +308,7 @@ class SalienScript {
       zone = await this.apiJoinBossZone(this.currentPlanetAndZone.bestZone.zone_position);
 
       // eslint-disable-next-line no-underscore-dangle
-      if (Number(zone.___headers.get('x-eresult')[0]) !== 1) {
+      if (Number(zone.___headers.get('x-eresult')) !== 1) {
         throw new SalienScriptRestart('!! Failed to join boss zone', zone);
       }
 
