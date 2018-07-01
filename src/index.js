@@ -241,8 +241,20 @@ class SalienScript {
         continue; // eslint-disable-line no-continue
       }
 
-      // TODO: support logging of boss_status and players
-      // https://github.com/SteamDatabase/SalienCheat/blob/master/cheat.php#L203
+      if (report.boss_status.boss_players) {
+        console.log(''); // eslint-disable-line no-console
+
+        // TODO: format player name so it doesn't screw up our neat output
+
+        report.boss_status.boss_players.forEach(player => {
+          let scoreCard = `  ${`${player.name}`.padEnd(30)}`;
+          scoreCard += ` - HP: ${chalk.yellow(`${player.hp}`.padStart(6))} / ${`${player.max_hp}`.padStart(6)}`;
+          scoreCard += ` - XP Gained: ${chalk.yellow(`${Number(player.xp_earned).toLocaleString()}`.padStart(12))}`;
+          this.logger(scoreCard);
+        });
+
+        console.log(''); // eslint-disable-line no-console
+      }
 
       if (report.game_over) {
         this.logger('@@ Boss -- The battle is over!');
@@ -257,11 +269,11 @@ class SalienScript {
         continue; // eslint-disable-line no-continue
       }
 
-      // TODO: this message could be far prettier
-      let bossStatusMsg = `@@ Boss -- HP: ${Number(report.boss_status.boss_hp)}`;
-      bossStatusMsg += `/${Number(report.boss_status.boss_max_hp)}`;
+      let bossStatusMsg = `@@ Boss -- HP: ${Number(report.boss_status.boss_hp).toLocaleString()}`;
+      bossStatusMsg += ` / ${Number(report.boss_status.boss_max_hp).toLocaleString()}`;
+      bossStatusMsg += ` (${getPercentage(report.boss_status.boss_hp / report.boss_status.boss_max_hp)}%)`;
       bossStatusMsg += ` - Lasers: ${report.num_laser_uses}`;
-      bossStatusMsg += ` - Team Heals: ${report.num_team_heals}`;
+      bossStatusMsg += ` - Team Heals: ${report.num_team_heals}\n`;
 
       this.logger(bossStatusMsg);
 
