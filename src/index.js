@@ -230,6 +230,9 @@ class SalienScript {
         }
       }
 
+      // if we didn't get an error, reset the allowed failure count
+      allowedBossFails = 10;
+
       if (!report.boss_status) {
         this.logger('@@ Boss -- Waiting...');
 
