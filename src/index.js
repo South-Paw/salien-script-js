@@ -282,7 +282,13 @@ class SalienScript {
   }
 
   async doGameLoop() {
+    let leaveAttempts = 0;
+
     while (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
+      if (leaveAttempts > 3) {
+        throw new SalienScriptRestart('Unable to leave planet...');
+      }
+
       this.steamThinksPlanet = await this.leaveCurrentGame(this.currentPlanetAndZone.id);
 
       if (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
@@ -290,6 +296,8 @@ class SalienScript {
 
         this.steamThinksPlanet = await this.leaveCurrentGame();
       }
+
+      leaveAttempts += 1;
     }
 
     let zone;
