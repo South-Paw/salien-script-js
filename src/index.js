@@ -57,7 +57,7 @@ class SalienScript {
     this.knownPlanets = new Map();
     this.currentPlanetAndZone = null;
     this.steamThinksPlanet = null;
-    this.skippedPlanets = [];
+    this.lastKnownPlanetId = null;
 
     // script variables that don't get reset
     this.clanCheckDone = false;
@@ -67,6 +67,7 @@ class SalienScript {
     this.defaultDelayMs = 5000;
     this.defaultDelaySec = this.defaultDelayMs / 1000;
     this.cutoff = 0.99;
+    this.defaultAllowedBossFails = 10;
   }
 
   resetScript() {
@@ -74,7 +75,7 @@ class SalienScript {
     this.knownPlanets = new Map();
     this.currentPlanetAndZone = null;
     this.steamThinksPlanet = null;
-    this.skippedPlanets = [];
+    this.lastKnownPlanetId = null;
   }
 
   logger(message, error) {
@@ -130,6 +131,10 @@ class SalienScript {
 
   async leaveCurrentGame(requestedPlanetId = 0) {
     const playerInfo = await this.apiGetPlayerInfo();
+
+    if (playerInfo.active_boss_game) {
+      await this.apiLeaveGame(playerInfo.active_boss_game);
+    }
 
     if (playerInfo.active_zone_game) {
       await this.apiLeaveGame(playerInfo.active_zone_game);
@@ -200,45 +205,68 @@ class SalienScript {
   }
 
   async playBossZone() {
-    const min = 120;
-    const max = 180;
-    const defaultAllowedFailures = 10;
-    const defaultBossDelay = 5000;
+    const healMin = 0;
+    const healMax = 120;
 
-    let nextHeal = Math.floor(new Date().getTime() / 1000) + Math.floor(Math.random() * (max - min + 1) + min);
-    let allowedBossFails = defaultAllowedFailures;
+    // Avoid first time not sync error
+    await delay(4000);
+
+    let allowedBossFails = this.defaultAllowedBossFails;
+    let nextHeal = Number.MAX_SAFE_INTEGER;
+    let waitingForPlayers = true;
+
+    const oldPlayerInfo = await this.apiGetPlayerInfo();
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
       let useHeal = 0;
-      const damageToBoss = 1;
+      const damageToBoss = waitingForPlayers ? 0 : 1;
       const damageTaken = 0;
 
       if (Math.floor(new Date().getTime() / 1000) >= nextHeal) {
         useHeal = 1;
         nextHeal = Math.floor(new Date().getTime() / 1000) + 120;
 
-        this.logger('@@ Boss -- Using heal ability');
+        this.logger(chalk.green('@@ Boss -- Using heal ability'));
       }
 
       const report = await this.apiReportBossDamage(useHeal, damageToBoss, damageTaken);
+
+      // eslint-disable-next-line no-underscore-dangle
+      if (Number(report.___headers.get('x-eresult')) === 11) {
+        throw new SalienScriptRestart('Recieved invalid boss state!');
+      }
 
       // eslint-disable-next-line no-underscore-dangle
       if (Number(report.___headers.get('x-eresult')) !== 1 && Number(report.___headers.get('x-eresult')) !== 93) {
         allowedBossFails -= 1;
 
         if (allowedBossFails < 1) {
-          throw new SalienScriptRestart('Boss battle had too many errors!');
+          this.logger(chalk.green('@@ Boss -- Battle had too many errors!'));
+
+          break;
         }
       }
 
       // if we didn't get an error, reset the allowed failure count
-      allowedBossFails = defaultAllowedFailures;
+      allowedBossFails = this.defaultAllowedBossFails;
+
+      if (report.waiting_for_players) {
+        this.logger(chalk.green('@@ Boss -- Waiting for players...'));
+
+        await delay(this.defaultDelayMs);
+
+        continue; // eslint-disable-line no-continue
+      } else if (waitingForPlayers) {
+        waitingForPlayers = false;
+        nextHeal =
+          Math.floor(new Date().getTime() / 1000) + Math.floor(Math.random() * (healMax - healMin + 1) + healMin);
+      }
 
       if (!report.boss_status) {
         this.logger('@@ Boss -- Waiting...');
 
-        await delay(defaultBossDelay);
+        await delay(this.defaultDelayMs);
 
         continue; // eslint-disable-line no-continue
       }
@@ -246,10 +274,9 @@ class SalienScript {
       if (report.boss_status.boss_players) {
         console.log(''); // eslint-disable-line no-console
 
-        // TODO: format player name better so it doesn't screw up our neat output
-
         report.boss_status.boss_players.forEach(player => {
-          let scoreCard = `  ${`${player.name}`.padEnd(30)}`;
+          // eslint-disable-next-line no-control-regex
+          let scoreCard = `  ${`${player.name.replace(/[^\x00-\x7F]/g, '')}`.padEnd(30)}`;
           scoreCard += ` - HP: ${chalk.yellow(`${player.hp}`.padStart(6))} / ${`${player.max_hp}`.padStart(6)}`;
           scoreCard += ` - XP Gained: ${chalk.yellow(`${Number(player.xp_earned).toLocaleString()}`.padStart(12))}`;
           this.logger(scoreCard);
@@ -259,16 +286,9 @@ class SalienScript {
       }
 
       if (report.game_over) {
-        this.logger('@@ Boss -- The battle is over!');
-        throw new SalienScriptRestart('Boss battle is over!');
-      }
+        this.logger(chalk.green('@@ Boss -- The battle has ended!'));
 
-      if (report.waiting_for_players) {
-        this.logger('@@ Boss -- Waiting for players...');
-
-        await delay(defaultBossDelay);
-
-        continue; // eslint-disable-line no-continue
+        break;
       }
 
       let bossStatusMsg = `@@ Boss -- HP: ${Number(report.boss_status.boss_hp).toLocaleString()}`;
@@ -279,52 +299,35 @@ class SalienScript {
 
       this.logger(bossStatusMsg);
 
+      await delay(this.defaultDelayMs);
+
       console.log(''); // eslint-disable-line no-console
+    }
+
+    const newPlayerInfo = await this.apiGetPlayerInfo();
+
+    if (newPlayerInfo.score) {
+      const newXp = Number(newPlayerInfo.score) - Number(oldPlayerInfo.score);
+
+      let bossReport = `++ Your score after boss battle:`;
+      bossReport += ` ${chalk.yellow(Number(newPlayerInfo.score).toLocaleString())}`;
+      bossReport += ` (+ ${chalk.yellow(`${newXp.toLocaleString()}`)} XP)`;
+      bossReport += ` - Current Level: ${chalk.green(newPlayerInfo.level)}`;
+
+      this.logger(bossReport);
+    }
+
+    if (newPlayerInfo.active_boss_game) {
+      await this.apiLeaveGame(newPlayerInfo.active_boss_game);
+    }
+
+    if (newPlayerInfo.active_planet) {
+      await this.apiLeaveGame(newPlayerInfo.active_planet);
     }
   }
 
-  async doGameLoop() {
-    let leaveAttempts = 0;
-
-    while (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
-      if (leaveAttempts > 3) {
-        throw new SalienScriptRestart('Unable to leave planet...');
-      }
-
-      this.steamThinksPlanet = await this.leaveCurrentGame(this.currentPlanetAndZone.id);
-
-      if (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
-        await this.apiJoinPlanet(this.currentPlanetAndZone.id);
-
-        this.steamThinksPlanet = await this.leaveCurrentGame();
-      }
-
-      leaveAttempts += 1;
-    }
-
-    let zone;
-
-    if (this.currentPlanetAndZone.bestZone.boss_active) {
-      zone = await this.apiJoinBossZone(this.currentPlanetAndZone.bestZone.zone_position);
-
-      // eslint-disable-next-line no-underscore-dangle
-      if (Number(zone.___headers.get('x-eresult')) !== 1) {
-        throw new SalienScriptRestart('!! Failed to join boss zone', zone);
-      }
-
-      await this.playBossZone();
-
-      return;
-    }
-
-    zone = await this.apiJoinZone(this.currentPlanetAndZone.bestZone.zone_position);
-
-    // rescan if we failed to join
-    if (!zone.zone_info) {
-      throw new SalienScriptRestart('!! Failed to join a zone', zone);
-    }
-
-    const zoneInfo = zone.zone_info;
+  async playNormalZone(zone) {
+    const { zone_info: zoneInfo } = zone;
 
     const zoneCapturePercent = getPercentage(zoneInfo.capture_progress);
 
@@ -390,7 +393,54 @@ class SalienScript {
     }
   }
 
+  async doGameLoop() {
+    if (!this.currentPlanetAndZone) {
+      await this.doGameSetup();
+    }
+
+    if (this.lastKnownPlanetId !== this.currentPlanetAndZone.id) {
+      while (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
+        this.steamThinksPlanet = await this.leaveCurrentGame(this.currentPlanetAndZone.id);
+
+        if (this.currentPlanetAndZone.id !== this.steamThinksPlanet) {
+          await this.apiJoinPlanet(this.currentPlanetAndZone.id);
+
+          this.steamThinksPlanet = await this.leaveCurrentGame();
+        }
+      }
+
+      this.lastKnownPlanetId = this.currentPlanetAndZone.id;
+    }
+
+    let zone;
+
+    // if the best zone is a boss zone
+    if (this.currentPlanetAndZone.bestZone.boss_active) {
+      zone = await this.apiJoinBossZone(this.currentPlanetAndZone.bestZone.zone_position);
+
+      // eslint-disable-next-line no-underscore-dangle
+      if (Number(zone.___headers.get('x-eresult')) !== 1) {
+        throw new SalienScriptRestart('!! Failed to join boss zone', zone);
+      }
+
+      await this.playBossZone();
+
+      return;
+    }
+
+    // otherwise we're in a normal zone and play the game normally
+    zone = await this.apiJoinZone(this.currentPlanetAndZone.bestZone.zone_position);
+
+    if (!zone.zone_info) {
+      throw new SalienScriptRestart('!! Failed to join a zone', zone);
+    }
+
+    await this.playNormalZone(zone);
+  }
+
   async init() {
+    this.resetScript();
+
     this.startTime = new Date().getTime();
 
     console.log(''); // eslint-disable-line no-console
@@ -398,8 +448,6 @@ class SalienScript {
     this.logger(chalk.bgCyan(' Thanks for choosing https://github.com/South-Paw/salien-script-js '));
     this.logger(chalk.bgCyan(' Remeber to drop us a ⭐ star on the project if you appreciate this script! '));
     console.log(''); // eslint-disable-line no-console
-
-    this.resetScript();
 
     try {
       await this.doClanSetup();
