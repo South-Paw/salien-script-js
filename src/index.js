@@ -222,7 +222,8 @@ class SalienScript {
       const report = await this.apiReportBossDamage(useHeal, damageToBoss, damageTaken);
 
       // eslint-disable-next-line no-underscore-dangle
-      if (Number(report.___headers.get('x-eresult')[0]) !== 1) {
+      if (Number(report.___headers.get('x-eresult')) !== 1 &&
+          Number(report.___headers.get('x-eresult')) !== 93)
         allowedBossFails -= 1;
 
         if (allowedBossFails < 1) {
@@ -243,6 +244,7 @@ class SalienScript {
 
       if (report.game_over) {
         this.logger('@@ Boss -- The battle is over!');
+        throw new SalienScriptRestart('Boss battle is over!');
 
         return;
       }
