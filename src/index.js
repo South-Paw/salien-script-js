@@ -237,7 +237,7 @@ class SalienScript {
     // eslint-disable-next-line no-constant-condition
     while (true) {
       let useHeal = 0;
-      const damageToBoss = waitingForPlayers ? 0 : 1;
+      const damageToBoss = waitingForPlayers ? 0 : Math.floor(Math.random() * (150 - 30 + 1) + 30);
       const damageTaken = 0;
 
       if (Math.floor(new Date().getTime() / 1000) >= nextHeal) {
