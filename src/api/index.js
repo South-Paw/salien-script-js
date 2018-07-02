@@ -29,6 +29,7 @@ const doFetch = async (method, params, requestOptions = {}, logger, isSilentRequ
 
   let request = null;
   let response = null;
+  let result;
   let attempts = 0;
 
   while (!response && attempts < maxRetries) {
@@ -38,6 +39,15 @@ const doFetch = async (method, params, requestOptions = {}, logger, isSilentRequ
       }
 
       request = await fetch(url, options);
+      result = Number(request.headers.get('x-eresult'));
+      if (result !== 1) {
+        const msg = request.headers.get('x-error_message');
+        if (msg) {
+          logger(chalk.bgRed(`API error ${result}: ${msg}`));
+        } else {
+          logger(chalk.red(`API result ${result}`));
+        }
+      }
       response = await request.json();
 
       // Create a unique key in the response object that we can use to get `x-eresult` from.

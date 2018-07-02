@@ -2,6 +2,9 @@ const fetch = require('node-fetch');
 
 const api = require('./index');
 
+const headersSuccess = new Map([
+  ['x-eresult', '1'],
+]);
 jest.mock('node-fetch');
 
 const token = 'token';
@@ -10,7 +13,7 @@ describe('api', () => {
   describe('getPlayerInfo()', () => {
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { a: 1 } }) });
 
       const response = await api.getPlayerInfo(token, mockLogger, true, 1, 0);
 
@@ -32,7 +35,7 @@ describe('api', () => {
   describe('getPlanets()', () => {
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { planets: [1, 2] } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { planets: [1, 2] } }) });
 
       const response = await api.getPlanets(mockLogger, true, 1, 0);
 
@@ -56,7 +59,7 @@ describe('api', () => {
 
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { planets: [1] } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { planets: [1] } }) });
 
       const response = await api.getPlanet(planetId, mockLogger, true, 1, 0);
 
@@ -80,7 +83,7 @@ describe('api', () => {
 
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { a: 1 } }) });
 
       const response = await api.representClan(token, clanId, mockLogger, true, 1, 0);
 
@@ -104,7 +107,7 @@ describe('api', () => {
 
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { a: 1 } }) });
 
       const response = await api.leaveGame(token, gameId, mockLogger, true, 1, 0);
 
@@ -128,7 +131,7 @@ describe('api', () => {
 
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { a: 1 } }) });
 
       const response = await api.joinPlanet(token, planetId, mockLogger, true, 1, 0);
 
@@ -152,7 +155,7 @@ describe('api', () => {
 
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { a: 1 } }) });
 
       const response = await api.joinZone(token, zoneId, mockLogger, true, 1, 0);
 
@@ -176,7 +179,7 @@ describe('api', () => {
 
     it('returns a response', async () => {
       const mockLogger = jest.fn();
-      fetch.mockResolvedValue({ json: async () => ({ response: { a: 1 } }) });
+      fetch.mockResolvedValue({ headers: headersSuccess, json: async () => ({ response: { a: 1 } }) });
 
       const response = await api.reportScore(token, score, mockLogger, true, 1, 0);
 
