@@ -202,4 +202,33 @@ const getBestPlanetAndZone = async (planets, logger) => {
   return planetsWithSortKeys.sort((a, b) => b.sortKey - a.sortKey)[0];
 };
 
-module.exports = { getZoneDifficultyName, getScoreForZone, getAllPlanetStates, getBestPlanetAndZone };
+const getSelectedPlanetBestZone = async (planets, logger, selectedPlanetId) => {
+  let foundBoss = false;
+  let selectedPlanet = null;
+
+  planets.forEach(planet => {
+    if (foundBoss) return;
+
+    if (planet.bestZone.type === 4) {
+      logger(chalk.green(`>> Planet ${planet.id} has an uncaptured boss zone, selecting it`));
+      foundBoss = true;
+      selectedPlanet = planet;
+    }
+  });
+
+  if (!foundBoss) {
+    const userKnownPlanets = new Map();
+    userKnownPlanets.set(selectedPlanetId, planets.get(selectedPlanetId));
+
+    return getBestPlanetAndZone(userKnownPlanets, logger);
+  }
+  return selectedPlanet;
+};
+
+module.exports = {
+  getZoneDifficultyName,
+  getScoreForZone,
+  getAllPlanetStates,
+  getBestPlanetAndZone,
+  getSelectedPlanetBestZone,
+};
